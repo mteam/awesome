@@ -367,7 +367,11 @@
     _Class.prototype.colliding = function(_arg) {
       var collision, collisions, directions, entities, entity, movement, tag, _i, _len, _ref;
       tag = _arg["with"], directions = _arg.from, movement = _arg.movement;
-      entities = this.scene.getEntitiesByTag(tag);
+      if (tag != null) {
+        entities = this.scene.getEntitiesByTag(tag);
+      } else {
+        entities = this.scene.entities;
+      }
       if (!_.isArray(directions)) {
         directions = [directions];
       }
@@ -442,13 +446,16 @@
       return this.bind('tick', this.prototype.tick);
     };
     _Class.prototype.$speed = 5;
+    _Class.prototype.$direction = 'right';
     _Class.prototype.startWalking = function(direction) {
       switch (direction) {
         case 'left':
           this.walking = 'left';
+          this.attrs.direction = 'left';
           return this.trigger('startWalking', this.walking);
         case 'right':
           this.walking = 'right';
+          this.attrs.direction = 'right';
           return this.trigger('startWalking', this.walking);
       }
     };
@@ -573,8 +580,15 @@
   Awesome.Entity = (function() {
     __extends(Entity, Awesome.Object);
     Entity.include('Events');
-    Entity.tag = function(tag) {
-      return this.array('tags').push(tag);
+    Entity.tag = function() {
+      var tag, tags, _i, _len, _results;
+      tags = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      _results = [];
+      for (_i = 0, _len = tags.length; _i < _len; _i++) {
+        tag = tags[_i];
+        _results.push(this.array('tags').push(tag));
+      }
+      return _results;
     };
     Entity.prototype.tagged = function(tag) {
       if (this.tags != null) {
@@ -757,7 +771,15 @@
       if (value == null) {
         return;
       }
+      if (name === 'position') {
+        this.setTitle(value);
+      }
       return _.extend(this.el.style, (_ref = this.css[name]) != null ? _ref.call(this.entity, value) : void 0);
+    };
+    EntityRenderer.prototype.setTitle = function(pos) {
+      if (pos != null) {
+        return this.el.title = "[" + pos[0] + ", " + pos[1] + "]";
+      }
     };
     EntityRenderer.prototype.css = {
       position: function(p) {

@@ -11,8 +11,8 @@ awesome-scripts =   awesome/underscore.coffee awesome/awesome.coffee awesome/obj
                     awesome/rendering/entity_renderer.coffee awesome/rendering/scene_renderer.coffee \
                     awesome/rendering/game_renderer.coffee
 
-game-scripts =      scenes/menu.coffee scenes/level.coffee modules/ai.coffee \
-					entities\enemy.coffee entities/attention_bar.coffee scenes/levels/candy_land.coffee \
+game-scripts =      scenes/menu.coffee scenes/level.coffee modules/ai.coffee modules/sight.coffee \
+					entities/enemy.coffee entities/attention_bar.coffee scenes/levels/candy_land.coffee \
 					entities/player.coffee entities/ninja.coffee \
 					game.coffee bootstrap.coffee
 

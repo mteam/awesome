@@ -3,8 +3,8 @@ entityIdCounter = 0
 class Awesome.Entity extends Awesome.Object
     @include 'Events'
 
-    @tag: (tag) ->
-        @array('tags').push tag
+    @tag: (tags...) ->
+        @array('tags').push tag for tag in tags
     
     tagged: (tag) ->
         if @tags?

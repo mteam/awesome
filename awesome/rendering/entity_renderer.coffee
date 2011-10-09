@@ -24,7 +24,13 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
     set: (name, value) =>
         return unless value?
 
+        @setTitle value if name is 'position'
+
         _.extend @el.style, @css[name]?.call @entity, value
+    
+    setTitle: (pos) ->
+        if pos?
+            @el.title = "[#{pos[0]}, #{pos[1]}]"
     
     css:
         position: (p) ->

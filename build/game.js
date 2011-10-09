@@ -1,4 +1,4 @@
-var AttentionBar, CandyLand, Enemy, Game, Level, Menu, Ninja, Player, game;
+var AttentionBar, CandyLand, Enemy, Game, Level, Menu, Ninja, Player, SightRect, game;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -28,12 +28,116 @@ Awesome.module('AI', (function() {
   function _Class() {}
   return _Class;
 })());
+SightRect = (function() {
+  __extends(SightRect, Awesome.Collisions.Rect);
+  function SightRect(entity, w, direction) {
+    this.w = w;
+    this.direction = direction;
+    this.entity = entity.getRect();
+  }
+  Object.defineProperties(SightRect.prototype, {
+    x: {
+      get: function() {
+        if (this.direction === 'left') {
+          return this.entity.x - this.w;
+        } else if (this.direction === 'right') {
+          return this.entity.wx;
+        }
+      }
+    },
+    y: {
+      get: function() {
+        return this.entity.y;
+      }
+    },
+    h: {
+      get: function() {
+        return this.entity.h;
+      }
+    }
+  });
+  return SightRect;
+})();
+Awesome.module('Sight', (function() {
+  function _Class() {}
+  _Class.prototype.$sight = 300;
+  _Class.init = function() {
+    return this.bind('tick', this.prototype.tick);
+  };
+  _Class.prototype.tick = function() {
+    var bar, isPlayer, seenEntities;
+    seenEntities = this.getSeenEntities(this.attrs.direction);
+    bar = this.scene.entities[0];
+    isPlayer = function(entity) {
+      return entity.entity instanceof Player;
+    };
+    if (_.any(seenEntities, isPlayer)) {
+      if (!bar.growing) {
+        return bar.grow();
+      }
+    } else {
+      if (bar.growing) {
+        return bar.stopGrowing();
+      }
+    }
+  };
+  _Class.prototype.getSeenEntities = function(direction) {
+    var entitiesInSight, topSide, visible;
+    entitiesInSight = this.getEntitiesInSight(direction);
+    topSide = this.scene.attrs.size[1];
+    visible = _.filter(entitiesInSight, function(entity) {
+      var rect;
+      rect = entity.rect;
+      if (rect.y >= topSide) {
+        return false;
+      } else {
+        if (rect.y < topSide) {
+          topSide = rect.y;
+        }
+        return true;
+      }
+    });
+    return visible;
+  };
+  _Class.prototype.getEntitiesInSight = function(direction) {
+    var collisions, distance, entity, entityRect, id, sightRect, _ref;
+    sightRect = this.getSightRect(direction);
+    collisions = [];
+    _ref = this.scene.entities;
+    for (id in _ref) {
+      entity = _ref[id];
+      if (entity.tagged('visible')) {
+        entityRect = entity.getRect();
+        if (this.detector.detect(entityRect, sightRect)) {
+          distance = direction === 'left' ? sightRect.wx - entityRect.wx : entityRect.x - sightRect.x;
+          collisions.push({
+            entity: entity,
+            distance: distance,
+            rect: entityRect
+          });
+        }
+      }
+    }
+    return _(collisions).sortBy(function(collision) {
+      return collision.distance;
+    });
+  };
+  _Class.prototype.getSightRect = function(direction) {
+    var _base, _ref, _ref2;
+    if ((_ref = this.sightRect) == null) {
+      this.sightRect = {};
+    }
+    return (_ref2 = (_base = this.sightRect)[direction]) != null ? _ref2 : _base[direction] = new SightRect(this, this.attrs.sight, direction);
+  };
+  return _Class;
+})());
 Enemy = (function() {
   __extends(Enemy, Awesome.Entity);
   function Enemy() {
     Enemy.__super__.constructor.apply(this, arguments);
   }
-  Enemy.include('Collisions', 'Gravity', 'Walking', 'AI');
+  Enemy.include('Collisions', 'Gravity', 'Walking', 'AI', 'Sight');
+  Enemy.tag('visible');
   Enemy.prototype.$color = 'red';
   Enemy.prototype.$size = [40, 80];
   Enemy.prototype.$z = 1;
@@ -124,7 +228,7 @@ CandyLand = (function() {
     Tree.prototype.$color = 'saddlebrown';
     Tree.prototype.$size = [50, 150];
     Tree.prototype.$z = 2;
-    Tree.tag('hideout');
+    Tree.tag('visible');
     return Tree;
   })();
   CandyLand.TallGrass = TallGrass = (function() {
@@ -135,7 +239,7 @@ CandyLand = (function() {
     TallGrass.prototype.$color = 'lawngreen';
     TallGrass.prototype.$size = [50, 50];
     TallGrass.prototype.$z = 2;
-    TallGrass.tag('hideout');
+    TallGrass.tag('visible');
     return TallGrass;
   })();
   CandyLand.Rock = Rock = (function() {
@@ -146,7 +250,7 @@ CandyLand = (function() {
     Rock.prototype.$color = 'gray';
     Rock.prototype.$size = [50, 50];
     Rock.prototype.$z = 2;
-    Rock.tag('hideout');
+    Rock.tag('visible');
     return Rock;
   })();
   CandyLand.Map = Map = (function() {
@@ -174,13 +278,14 @@ CandyLand = (function() {
       position: [600, 200]
     });
     Map.add(CandyLand.TallGrass, {
-      position: [800, 300]
+      position: [1200, 300]
     });
     Map.add(CandyLand.Rock, {
       position: [1000, 300]
     });
     Map.add(Enemy, {
-      position: [1300, 10]
+      position: [1300, 10],
+      direction: 'left'
     });
     return Map;
   })();
@@ -201,6 +306,7 @@ Player = (function() {
     Player.__super__.constructor.apply(this, arguments);
   }
   Player.include('Collisions', 'Gravity', 'Walking', 'Jumping', 'Crouching', 'Controls');
+  Player.tag('visible');
   Player.prototype.$z = 1;
   return Player;
 })();

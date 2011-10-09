@@ -3,14 +3,17 @@ Awesome.module 'Walking', class
         @bind 'tick', @::tick
     
     $speed: 5
+    $direction: 'right'
     
     startWalking: (direction) ->
         switch direction
             when 'left'
                 @walking = 'left'
+                @attrs.direction = 'left'
                 @trigger 'startWalking', @walking
             when 'right'
                 @walking = 'right'
+                @attrs.direction = 'right'
                 @trigger 'startWalking', @walking
     
     stopWalking: ->

@@ -2,7 +2,10 @@ Awesome.module 'Collisions', class
     detector: new Awesome.Collisions.Detector
 
     colliding: ({with: tag, from: directions, movement}) ->
-        entities = @scene.getEntitiesByTag tag
+        if tag?
+            entities = @scene.getEntitiesByTag tag
+        else
+            entities = @scene.entities
         directions = [directions] unless _.isArray directions
 
         collisions = []
