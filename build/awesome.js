@@ -367,7 +367,11 @@
     _Class.prototype.colliding = function(_arg) {
       var collision, collisions, directions, entities, entity, movement, tag, _i, _len, _ref;
       tag = _arg["with"], directions = _arg.from, movement = _arg.movement;
-      entities = this.scene.getEntitiesByTag(tag);
+      if (tag != null) {
+        entities = this.scene.getEntitiesByTag(tag);
+      } else {
+        entities = this.scene.entities;
+      }
       if (!_.isArray(directions)) {
         directions = [directions];
       }
@@ -442,13 +446,16 @@
       return this.bind('tick', this.prototype.tick);
     };
     _Class.prototype.$speed = 5;
+    _Class.prototype.$direction = 'right';
     _Class.prototype.startWalking = function(direction) {
       switch (direction) {
         case 'left':
           this.walking = 'left';
+          this.attrs.direction = 'left';
           return this.trigger('startWalking', this.walking);
         case 'right':
           this.walking = 'right';
+          this.attrs.direction = 'right';
           return this.trigger('startWalking', this.walking);
       }
     };
@@ -573,8 +580,15 @@
   Awesome.Entity = (function() {
     __extends(Entity, Awesome.Object);
     Entity.include('Events');
-    Entity.tag = function(tag) {
-      return this.array('tags').push(tag);
+    Entity.tag = function() {
+      var tag, tags, _i, _len, _results;
+      tags = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      _results = [];
+      for (_i = 0, _len = tags.length; _i < _len; _i++) {
+        tag = tags[_i];
+        _results.push(this.array('tags').push(tag));
+      }
+      return _results;
     };
     Entity.prototype.tagged = function(tag) {
       if (this.tags != null) {
@@ -727,7 +741,7 @@
       this.entity = entity;
       this.set = __bind(this.set, this);
       this.createElement();
-      this.appendToSceneElement();
+      this.appendToScene();
       this.setupStyles();
       this.bind();
     }
@@ -735,8 +749,8 @@
       this.el = document.createElement('div');
       return this.el.id = "entity_" + this.entity.id;
     };
-    EntityRenderer.prototype.appendToSceneElement = function() {
-      return this.entity.scene.renderer.el.appendChild(this.el);
+    EntityRenderer.prototype.appendToScene = function() {
+      return this.entity.scene.renderer.appendElement(this.el);
     };
     EntityRenderer.prototype.setupStyles = function() {
       var name, value, _ref, _results;
@@ -757,7 +771,15 @@
       if (value == null) {
         return;
       }
+      if (name === 'position') {
+        this.setTitle(value);
+      }
       return _.extend(this.el.style, (_ref = this.css[name]) != null ? _ref.call(this.entity, value) : void 0);
+    };
+    EntityRenderer.prototype.setTitle = function(pos) {
+      if (pos != null) {
+        return this.el.title = "[" + pos[0] + ", " + pos[1] + "]";
+      }
     };
     EntityRenderer.prototype.css = {
       position: function(p) {
@@ -790,12 +812,25 @@
     function SceneRenderer(scene) {
       this.scene = scene;
       this.createElement();
-      this.appendToGameElement();
+      this.appendToGame();
     }
     SceneRenderer.prototype.createElement = function() {
-      this.el = document.createElement('div');
-      this.el.id = "scene_" + this.scene.name;
-      return _.extend(this.el.style, {
+      this.createWrapper();
+      return this.createScene();
+    };
+    SceneRenderer.prototype.createWrapper = function() {
+      this.wrapper = document.createElement('div');
+      this.wrapper.id = "scene_" + this.scene.name;
+      return _.extend(this.wrapper.style, {
+        width: "100%",
+        height: "100%",
+        position: "relative"
+      });
+    };
+    SceneRenderer.prototype.createScene = function() {
+      this.sceneEl = document.createElement('div');
+      this.wrapper.appendChild(this.sceneEl);
+      return _.extend(this.sceneEl.style, {
         width: this.scene.attrs.size[0] + "px",
         height: this.scene.attrs.size[1] + "px",
         left: "0px",
@@ -803,6 +838,15 @@
         position: "absolute",
         overflow: "hidden"
       });
+    };
+    SceneRenderer.prototype.appendToGame = function() {
+      return this.scene.game.renderer.appendElement(this.wrapper);
+    };
+    SceneRenderer.prototype.appendElement = function(element) {
+      return this.sceneEl.appendChild(element);
+    };
+    SceneRenderer.prototype.appendElementToWrapper = function(element) {
+      return this.wrapper.appendChild(element);
     };
     SceneRenderer.prototype.follow = function(entity) {
       return entity.attrs.bind('change', __bind(function(name, value) {
@@ -812,12 +856,9 @@
         }
         left = this.scene.game.attrs.size[0] / 2 - value[0];
         top = this.scene.game.attrs.size[1] / 2 - value[1];
-        this.el.style.left = "" + left + "px";
-        return this.el.style.top = "" + top + "px";
+        this.sceneEl.style.left = "" + left + "px";
+        return this.sceneEl.style.top = "" + top + "px";
       }, this));
-    };
-    SceneRenderer.prototype.appendToGameElement = function() {
-      return this.scene.game.renderer.el.appendChild(this.el);
     };
     return SceneRenderer;
   })();
@@ -850,6 +891,9 @@
       } else {
         return bind('load', append, false);
       }
+    };
+    GameRenderer.prototype.appendElement = function(element) {
+      return this.el.appendChild(element);
     };
     return GameRenderer;
   })();
