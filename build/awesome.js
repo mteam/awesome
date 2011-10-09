@@ -727,7 +727,7 @@
       this.entity = entity;
       this.set = __bind(this.set, this);
       this.createElement();
-      this.appendToSceneElement();
+      this.appendToScene();
       this.setupStyles();
       this.bind();
     }
@@ -735,8 +735,8 @@
       this.el = document.createElement('div');
       return this.el.id = "entity_" + this.entity.id;
     };
-    EntityRenderer.prototype.appendToSceneElement = function() {
-      return this.entity.scene.renderer.el.appendChild(this.el);
+    EntityRenderer.prototype.appendToScene = function() {
+      return this.entity.scene.renderer.appendElement(this.el);
     };
     EntityRenderer.prototype.setupStyles = function() {
       var name, value, _ref, _results;
@@ -790,12 +790,25 @@
     function SceneRenderer(scene) {
       this.scene = scene;
       this.createElement();
-      this.appendToGameElement();
+      this.appendToGame();
     }
     SceneRenderer.prototype.createElement = function() {
-      this.el = document.createElement('div');
-      this.el.id = "scene_" + this.scene.name;
-      return _.extend(this.el.style, {
+      this.createWrapper();
+      return this.createScene();
+    };
+    SceneRenderer.prototype.createWrapper = function() {
+      this.wrapper = document.createElement('div');
+      this.wrapper.id = "scene_" + this.scene.name;
+      return _.extend(this.wrapper.style, {
+        width: "100%",
+        height: "100%",
+        position: "relative"
+      });
+    };
+    SceneRenderer.prototype.createScene = function() {
+      this.sceneEl = document.createElement('div');
+      this.wrapper.appendChild(this.sceneEl);
+      return _.extend(this.sceneEl.style, {
         width: this.scene.attrs.size[0] + "px",
         height: this.scene.attrs.size[1] + "px",
         left: "0px",
@@ -803,6 +816,15 @@
         position: "absolute",
         overflow: "hidden"
       });
+    };
+    SceneRenderer.prototype.appendToGame = function() {
+      return this.scene.game.renderer.appendElement(this.wrapper);
+    };
+    SceneRenderer.prototype.appendElement = function(element) {
+      return this.sceneEl.appendChild(element);
+    };
+    SceneRenderer.prototype.appendElementToWrapper = function(element) {
+      return this.wrapper.appendChild(element);
     };
     SceneRenderer.prototype.follow = function(entity) {
       return entity.attrs.bind('change', __bind(function(name, value) {
@@ -812,12 +834,9 @@
         }
         left = this.scene.game.attrs.size[0] / 2 - value[0];
         top = this.scene.game.attrs.size[1] / 2 - value[1];
-        this.el.style.left = "" + left + "px";
-        return this.el.style.top = "" + top + "px";
+        this.sceneEl.style.left = "" + left + "px";
+        return this.sceneEl.style.top = "" + top + "px";
       }, this));
-    };
-    SceneRenderer.prototype.appendToGameElement = function() {
-      return this.scene.game.renderer.el.appendChild(this.el);
     };
     return SceneRenderer;
   })();
@@ -850,6 +869,9 @@
       } else {
         return bind('load', append, false);
       }
+    };
+    GameRenderer.prototype.appendElement = function(element) {
+      return this.el.appendChild(element);
     };
     return GameRenderer;
   })();

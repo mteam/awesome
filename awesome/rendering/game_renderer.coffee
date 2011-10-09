@@ -21,3 +21,6 @@ class Awesome.Rendering.GameRenderer extends Awesome.Object
             append()
         else
             bind 'load', append, false
+    
+    appendElement: (element) ->
+        @el.appendChild element

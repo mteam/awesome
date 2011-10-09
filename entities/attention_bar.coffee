@@ -41,6 +41,9 @@ class AttentionBar.Renderer extends Awesome.Rendering.EntityRenderer
         super
 
         @el.style.border = "1px solid gray"
+    
+    appendToScene: ->
+        @entity.scene.renderer.appendElementToWrapper @el
 
     _(@object('css')).extend
         attention: (a) ->

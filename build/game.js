@@ -88,6 +88,9 @@ AttentionBar.Renderer = (function() {
     Renderer.__super__.setupStyles.apply(this, arguments);
     return this.el.style.border = "1px solid gray";
   };
+  Renderer.prototype.appendToScene = function() {
+    return this.entity.scene.renderer.appendElementToWrapper(this.el);
+  };
   _(Renderer.object('css')).extend({
     attention: function(a) {
       return {

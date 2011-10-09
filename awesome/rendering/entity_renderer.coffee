@@ -1,7 +1,7 @@
 class Awesome.Rendering.EntityRenderer extends Awesome.Object
     constructor: (@entity) ->
         @createElement()
-        @appendToSceneElement()
+        @appendToScene()
         @setupStyles()
         @bind()
     
@@ -9,8 +9,8 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
         @el = document.createElement 'div'
         @el.id = "entity_#{@entity.id}"
     
-    appendToSceneElement: ->
-        @entity.scene.renderer.el.appendChild @el
+    appendToScene: ->
+        @entity.scene.renderer.appendElement @el
     
     setupStyles: ->
         @el.style.position = 'absolute'
