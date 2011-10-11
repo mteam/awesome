@@ -1,4 +1,4 @@
-var AttentionBar, CandyLand, Enemy, Game, Level, Menu, Ninja, Player, SightRect, game;
+var AttentionBar, CandyLand, DeathScreen, Enemy, Game, Level, Menu, Ninja, Player, SightRect, game;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -23,6 +23,19 @@ Level = (function() {
     Level.__super__.constructor.apply(this, arguments);
   }
   return Level;
+})();
+DeathScreen = (function() {
+  __extends(DeathScreen, Awesome.Scene);
+  function DeathScreen() {
+    DeathScreen.__super__.constructor.apply(this, arguments);
+  }
+  DeathScreen.add(Awesome.Entities.Text, {
+    text: 'Fail',
+    position: [325, 175],
+    size: [150, 50],
+    fontSize: 30
+  });
+  return DeathScreen;
 })();
 Awesome.module('AI', (function() {
   function _Class() {}
@@ -131,13 +144,32 @@ Awesome.module('Sight', (function() {
   };
   return _Class;
 })());
+Awesome.module('Death', (function() {
+  function _Class() {}
+  _Class.init = function() {
+    return this.bind('tick', this.prototype.tick);
+  };
+  _Class.prototype.tick = function() {
+    var collisions;
+    collisions = this.colliding({
+      "with": 'enemy'
+    });
+    if (collisions.length) {
+      return this.die();
+    }
+  };
+  _Class.prototype.die = function() {
+    return alert('DIIIIEEEEEE!!!');
+  };
+  return _Class;
+})());
 Enemy = (function() {
   __extends(Enemy, Awesome.Entity);
   function Enemy() {
     Enemy.__super__.constructor.apply(this, arguments);
   }
   Enemy.include('Collisions', 'Gravity', 'Walking', 'AI', 'Sight');
-  Enemy.tag('visible');
+  Enemy.tag('visible', 'enemy');
   Enemy.prototype.$color = 'red';
   Enemy.prototype.$size = [40, 80];
   Enemy.prototype.$z = 1;
@@ -305,7 +337,7 @@ Player = (function() {
   function Player() {
     Player.__super__.constructor.apply(this, arguments);
   }
-  Player.include('Collisions', 'Gravity', 'Walking', 'Jumping', 'Crouching', 'Controls');
+  Player.include('Collisions', 'Gravity', 'Walking', 'Jumping', 'Death', 'Crouching', 'Controls');
   Player.tag('visible');
   Player.prototype.$z = 1;
   return Player;
@@ -328,7 +360,8 @@ Game = (function() {
   Game.prototype.$size = [800, 400];
   Game.addScene('menu', Menu);
   Game.addScene('candyLand', CandyLand);
+  Game.addScene('deathScreen', DeathScreen);
   return Game;
 })();
 game = new Game;
-game.run('candyLand');
+game.run('deathScreen');

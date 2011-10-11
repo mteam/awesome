@@ -8,6 +8,8 @@ class Awesome.Game extends Awesome.Object
         @timer.start()
 
     run: (name) ->
+        @runningScene.remove() if @runningScene?
+
         scene = @scenes[name]
         instance = new scene this, name
         @runningScene = instance

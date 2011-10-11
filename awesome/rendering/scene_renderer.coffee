@@ -46,3 +46,6 @@ class Awesome.Rendering.SceneRenderer extends Awesome.Object
 
             @sceneEl.style.left = "#{left}px"
             @sceneEl.style.top = "#{top}px"
+    
+    remove: ->
+        @scene.game.renderer.removeElement @wrapper

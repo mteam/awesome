@@ -5,7 +5,7 @@ class Awesome.Scene extends Awesome.Object
         @array('classEntities').push {entity, properties}
     
     constructor: (@game, @name) ->
-        @size = @game.size unless @size
+        @attrs.size = @game.attrs.size unless @attrs.size
         @renderer = new Awesome.Rendering.SceneRenderer this
         @entities = {}
 
@@ -33,4 +33,9 @@ class Awesome.Scene extends Awesome.Object
     
     getEntitiesByTag: (tag) ->
         entity for id, entity of @entities when entity.tagged tag
+    
+    remove: ->
+        @renderer.remove()
+
+        entity.remove() for id, entity of @entities
 

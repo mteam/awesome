@@ -1,3 +1,3 @@
 game = new Game
 
-game.run 'candyLand'
+game.run 'deathScreen'

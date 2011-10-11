@@ -1,7 +1,7 @@
 class Enemy extends Awesome.Entity
     @include 'Collisions', 'Gravity', 'Walking', 'AI', 'Sight'
     
-    @tag 'visible'
+    @tag 'visible', 'enemy'
 
     $color: 'red'
     $size: [40, 80]

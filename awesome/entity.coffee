@@ -23,3 +23,5 @@ class Awesome.Entity extends Awesome.Object
     
     getRect: ->
         @rect ?= new Awesome.Collisions.EntityRect this
+    
+    remove: ->

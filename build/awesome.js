@@ -372,14 +372,14 @@
       } else {
         entities = this.scene.entities;
       }
-      if (!_.isArray(directions)) {
+      if ((directions != null) && !_.isArray(directions)) {
         directions = [directions];
       }
       collisions = [];
       for (_i = 0, _len = entities.length; _i < _len; _i++) {
         entity = entities[_i];
         collision = this.detector.detect(this.getRect(), entity.getRect());
-        if (collision && (collision.direction != null ? (_ref = collision.direction, __indexOf.call(directions, _ref) >= 0) : true)) {
+        if (collision && (directions != null ? (_ref = collision.direction, __indexOf.call(directions, _ref) >= 0) : true)) {
           collisions.push(collision);
         }
       }
@@ -613,6 +613,7 @@
       var _ref;
       return (_ref = this.rect) != null ? _ref : this.rect = new Awesome.Collisions.EntityRect(this);
     };
+    Entity.prototype.remove = function() {};
     return Entity;
   })();
   Awesome.Timer = (function() {
@@ -646,8 +647,8 @@
       var entity, properties, _i, _len, _ref, _ref2, _ref3;
       this.game = game;
       this.name = name;
-      if (!this.size) {
-        this.size = this.game.size;
+      if (!this.attrs.size) {
+        this.attrs.size = this.game.attrs.size;
       }
       this.renderer = new Awesome.Rendering.SceneRenderer(this);
       this.entities = {};
@@ -692,6 +693,17 @@
       }
       return _results;
     };
+    Scene.prototype.remove = function() {
+      var entity, id, _ref, _results;
+      this.renderer.remove();
+      _ref = this.entities;
+      _results = [];
+      for (id in _ref) {
+        entity = _ref[id];
+        _results.push(entity.remove());
+      }
+      return _results;
+    };
     return Scene;
   })();
   Awesome.Game = (function() {
@@ -706,6 +718,9 @@
     }
     Game.prototype.run = function(name) {
       var instance, scene;
+      if (this.runningScene != null) {
+        this.runningScene.remove();
+      }
       scene = this.scenes[name];
       instance = new scene(this, name);
       return this.runningScene = instance;
@@ -860,6 +875,9 @@
         return this.sceneEl.style.top = "" + top + "px";
       }, this));
     };
+    SceneRenderer.prototype.remove = function() {
+      return this.scene.game.renderer.removeElement(this.wrapper);
+    };
     return SceneRenderer;
   })();
   Awesome.Rendering.GameRenderer = (function() {
@@ -895,6 +913,41 @@
     GameRenderer.prototype.appendElement = function(element) {
       return this.el.appendChild(element);
     };
+    GameRenderer.prototype.removeElement = function(element) {
+      return this.el.removeChild(element);
+    };
     return GameRenderer;
   })();
+  Awesome.Entities.Text = (function() {
+    var TextRenderer;
+    __extends(Text, Awesome.Entity);
+    function Text() {
+      Text.__super__.constructor.apply(this, arguments);
+    }
+    Text.Renderer = TextRenderer = (function() {
+      __extends(TextRenderer, Awesome.Rendering.EntityRenderer);
+      function TextRenderer() {
+        TextRenderer.__super__.constructor.apply(this, arguments);
+      }
+      TextRenderer.prototype.set = function(name, value) {
+        if (name !== 'text') {
+          return TextRenderer.__super__.set.apply(this, arguments);
+        } else {
+          return this.el.innerHTML = value;
+        }
+      };
+      _.extend(TextRenderer.object('css'), {
+        fontSize: function(s) {
+          return {
+            fontSize: s + "px"
+          };
+        }
+      });
+      return TextRenderer;
+    })();
+    Text.prototype.getRenderer = function() {
+      return new Text.Renderer(this);
+    };
+    return Text;
+  }).call(this);
 }).call(this);

@@ -24,3 +24,6 @@ class Awesome.Rendering.GameRenderer extends Awesome.Object
     
     appendElement: (element) ->
         @el.appendChild element
+    
+    removeElement: (element) ->
+        @el.removeChild element
