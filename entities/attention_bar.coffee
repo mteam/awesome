@@ -1,9 +1,11 @@
 class AttentionBar extends Awesome.Entity
-    $growSpeed: 0.5
+    $growSpeed: 2
     $fallSpeed: 0.2
     $position: [10, 10]
     $size: [200, 10]
     $z: 10
+
+    @tag 'attentionBar'
 
     constructor: ->
         super

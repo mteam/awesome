@@ -8,4 +8,3 @@ Awesome.module 'Death', class
             @die()
     
     die: ->
-        alert 'DIIIIEEEEEE!!!'

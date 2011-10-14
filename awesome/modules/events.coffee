@@ -35,3 +35,6 @@ Awesome.module 'Events', class
     logEvent: (event) ->
         @bind event, ->
             console.log event
+    
+    clearEvents: ->
+        delete @events

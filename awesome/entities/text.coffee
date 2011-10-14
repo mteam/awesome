@@ -9,6 +9,8 @@ class Awesome.Entities.Text extends Awesome.Entity
         _.extend @object('css'),
             fontSize: (s) ->
                 fontSize: s + "px"
+            align: (a) ->
+                textAlign: a
 
     getRenderer: ->
         new Text.Renderer this

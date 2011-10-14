@@ -1,14 +1,17 @@
 class Awesome.Rendering.EntityRenderer extends Awesome.Object
     constructor: (@entity) ->
         @createElement()
+        @setElementId()
         @appendToScene()
         @setupStyles()
         @bind()
     
     createElement: ->
         @el = document.createElement 'div'
-        @el.id = "entity_#{@entity.id}"
     
+    setElementId: ->
+        @el.id = "entity_#{@entity.id}"
+
     appendToScene: ->
         @entity.scene.renderer.appendElement @el
     
@@ -26,11 +29,14 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
 
         @setTitle value if name is 'position'
 
-        _.extend @el.style, @css[name]?.call @entity, value
+        _.extend @el.style, @getCssValue(name, value)
     
     setTitle: (pos) ->
         if pos?
             @el.title = "[#{pos[0]}, #{pos[1]}]"
+    
+    getCssValue: (name, value) ->
+        @css[name]?.call @entity, value
     
     css:
         position: (p) ->
@@ -43,5 +49,12 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
             backgroundColor: c
         z: (z) ->
             zIndex: z
+        background: (b) ->
+            backgroundImage: "url(../images/#{b})"
+        bgRepeat: (r) ->
+            backgroundRepeat:
+                switch r
+                    when 'x' then 'repeat-x'
+                    when 'y' then 'repeat-y'
 
         

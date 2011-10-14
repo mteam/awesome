@@ -1,3 +1,3 @@
 game = new Game
 
-game.run 'deathScreen'
+game.run 'menu'

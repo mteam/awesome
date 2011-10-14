@@ -5,3 +5,12 @@ class Player extends Awesome.Entity
     @tag 'visible'
     
     $z: 1
+
+    constructor: ->
+        super
+
+        bar = @scene.getEntitiesByTag('attentionBar')[0]
+        bar.bind 'full', => @die()
+
+    die: ->
+        @scene.showDeathScreen()

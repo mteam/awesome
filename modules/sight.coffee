@@ -20,7 +20,7 @@ Awesome.module 'Sight', class
     
     tick: ->
         seenEntities = @getSeenEntities @attrs.direction
-        bar = @scene.entities[0]
+        bar = @scene.getEntitiesByTag('attentionBar')[0]
         isPlayer = (entity) -> entity.entity instanceof Player
 
         if _.any seenEntities, isPlayer

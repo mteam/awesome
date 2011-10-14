@@ -5,3 +5,4 @@ class Game extends Awesome.Game
     @addScene 'menu', Menu
     @addScene 'candyLand', CandyLand
     @addScene 'deathScreen', DeathScreen
+    @addScene 'playerChooser', PlayerChooser
