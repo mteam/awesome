@@ -80,13 +80,18 @@ class CandyLand extends Level
         @add CandyLand.Land, position: [0, 350], size: [5000, 40]
         @add CandyLand.FlyingLand, position: [200, 300], size: [100, 20]
         @add CandyLand.FlyingLand, position: [320, 250], size: [100, 20]
-        @add CandyLand.FlyingLand, position: [440, 200], size: [100, 20]
+        @add CandyLand.FlyingLand, position: [440, 200], size: [1000, 20]
 
         @add CandyLand.Tree, position: [600, 260]
         @add CandyLand.TallGrass, position: [1200, 300]
         @add CandyLand.Rock, position: [1000, 300]
 
-        @add Enemy, position: [1300, 10], direction: 'left'
+        @add Enemy, position: [1300, 250], direction: 'left'
+
+        @add End, position: [4500, 250]
     
     $size: [5000, 400]
     $map: @Map
+
+    runNextScene: ->
+        @game.run 'tralalalandia', @playerClass

@@ -701,8 +701,8 @@
   })();
   Awesome.Game = (function() {
     __extends(Game, Awesome.Object);
-    Game.addScene = function(name, scene) {
-      return this.object('scenes')[name] = scene;
+    Game.addScene = function(scene) {
+      return this.object('scenes')[scene.prototype.name] = scene;
     };
     function Game() {
       this.renderer = new Awesome.Rendering.GameRenderer(this);
@@ -845,6 +845,11 @@
       this.scene = scene;
       this.createElement();
       this.appendToGame();
+      this.sceneEl.addEventListener('click', function(e) {
+        if (e.button === 1) {
+          return console.log("[" + e.offsetX + ", " + e.offsetY + "]");
+        }
+      });
     }
     SceneRenderer.prototype.createElement = function() {
       this.createWrapper();

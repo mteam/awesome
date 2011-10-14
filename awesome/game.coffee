@@ -1,6 +1,6 @@
 class Awesome.Game extends Awesome.Object
-    @addScene: (name, scene) ->
-        @object('scenes')[name] = scene
+    @addScene: (scene) ->
+        @object('scenes')[scene::name] = scene
 
     constructor: ->
         @renderer = new Awesome.Rendering.GameRenderer this

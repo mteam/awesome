@@ -2,6 +2,9 @@ class Awesome.Rendering.SceneRenderer extends Awesome.Object
     constructor: (@scene) ->
         @createElement()
         @appendToGame()
+
+        @sceneEl.addEventListener 'click', (e) ->
+            console.log "[#{e.offsetX}, #{e.offsetY}]" if e.button is 1
     
     createElement: ->
         @createWrapper()
