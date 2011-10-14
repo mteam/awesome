@@ -2,14 +2,14 @@ class CandyLand extends Level
     name: 'candyLand'
 
     @Land: class Land extends Awesome.Entity
-        $background: 'candyland/Map/land.png?1'
+        $background: 'candyland/map/land.png'
         $bgRepeat: 'x'
         $z: 0
 
         @tag 'static'
 
     @FlyingLand: class FlyingLand extends Awesome.Entity
-        $background: ['candyland/Map/1.png', 'candyland/Map/2.png', 'candyland/Map/3.png']
+        $background: ['candyland/map/1.png', 'candyland/map/2.png', 'candyland/map/3.png']
         $z: 0
 
         @tag 'static'

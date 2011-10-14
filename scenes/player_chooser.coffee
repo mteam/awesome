@@ -5,9 +5,9 @@ class PlayerChooser extends Awesome.Scene
         size: [200, 50], position: [300, 100],
         text: 'Choose your villian', align: 'center', fontSize: 25
     
-    @add Awesome.Entities.Button, size: [80, 120], position: [250, 180], image: 'characters/Hotass/standing.png'
-    @add Awesome.Entities.Button, size: [80, 120], position: [350, 180], image: 'characters/Ninja/standing.png'
-    @add Awesome.Entities.Button, { size: [80, 120], position: [450, 180], image: 'characters/Pirate/standing.png' }
+    @add Awesome.Entities.Button, size: [80, 120], position: [250, 180], image: 'characters/hotass/standing.png'
+    @add Awesome.Entities.Button, size: [80, 120], position: [350, 180], image: 'characters/ninja/standing.png'
+    @add Awesome.Entities.Button, { size: [80, 120], position: [450, 180], image: 'characters/pirate/standing.png' }
 
     runLevel: (player) ->
         @game.run 'candyLand', player
