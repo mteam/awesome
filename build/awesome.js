@@ -329,6 +329,9 @@
         return console.log(event);
       });
     };
+    _Class.prototype.clearEvents = function() {
+      return delete this.events;
+    };
     return _Class;
   })());
   Awesome.module('Gravity', (function() {
@@ -372,14 +375,14 @@
       } else {
         entities = this.scene.entities;
       }
-      if (!_.isArray(directions)) {
+      if ((directions != null) && !_.isArray(directions)) {
         directions = [directions];
       }
       collisions = [];
       for (_i = 0, _len = entities.length; _i < _len; _i++) {
         entity = entities[_i];
         collision = this.detector.detect(this.getRect(), entity.getRect());
-        if (collision && (collision.direction != null ? (_ref = collision.direction, __indexOf.call(directions, _ref) >= 0) : true)) {
+        if (collision && (directions != null ? (_ref = collision.direction, __indexOf.call(directions, _ref) >= 0) : true)) {
           collisions.push(collision);
         }
       }
@@ -402,17 +405,8 @@
       return this.jumping = false;
     };
     _Class.prototype.tick = function() {
-      var collisions;
       if (this.jumping) {
-        collisions = this.colliding({
-          "with": 'static',
-          from: 'bottom'
-        });
-        if (collisions.length) {
-          return this.stopJumping();
-        } else {
-          return this.attrs.position[1] -= this.attrs.jump;
-        }
+        return this.attrs.position[1] -= this.attrs.jump;
       }
     };
     return _Class;
@@ -613,6 +607,7 @@
       var _ref;
       return (_ref = this.rect) != null ? _ref : this.rect = new Awesome.Collisions.EntityRect(this);
     };
+    Entity.prototype.remove = function() {};
     return Entity;
   })();
   Awesome.Timer = (function() {
@@ -642,12 +637,12 @@
         properties: properties
       });
     };
-    function Scene(game, name) {
+    function Scene(game, name, args) {
       var entity, properties, _i, _len, _ref, _ref2, _ref3;
       this.game = game;
       this.name = name;
-      if (!this.size) {
-        this.size = this.game.size;
+      if (!this.attrs.size) {
+        this.attrs.size = this.game.attrs.size;
       }
       this.renderer = new Awesome.Rendering.SceneRenderer(this);
       this.entities = {};
@@ -662,7 +657,7 @@
         _ref3.addEntitiesToScene(this);
       }
       if (this.run != null) {
-        this.run();
+        this.run.apply(this, args);
       }
     }
     Scene.prototype.add = function(entity, properties) {
@@ -692,6 +687,16 @@
       }
       return _results;
     };
+    Scene.prototype.remove = function() {
+      var entity, id, _ref;
+      this.renderer.remove();
+      _ref = this.entities;
+      for (id in _ref) {
+        entity = _ref[id];
+        entity.remove();
+      }
+      return this.game.timer.clearEvents();
+    };
     return Scene;
   })();
   Awesome.Game = (function() {
@@ -704,10 +709,14 @@
       this.timer = new Awesome.Timer;
       this.timer.start();
     }
-    Game.prototype.run = function(name) {
-      var instance, scene;
+    Game.prototype.run = function() {
+      var args, instance, name, scene;
+      name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (this.runningScene != null) {
+        this.runningScene.remove();
+      }
       scene = this.scenes[name];
-      instance = new scene(this, name);
+      instance = new scene(this, name, args);
       return this.runningScene = instance;
     };
     return Game;
@@ -741,12 +750,15 @@
       this.entity = entity;
       this.set = __bind(this.set, this);
       this.createElement();
+      this.setElementId();
       this.appendToScene();
       this.setupStyles();
       this.bind();
     }
     EntityRenderer.prototype.createElement = function() {
-      this.el = document.createElement('div');
+      return this.el = document.createElement('div');
+    };
+    EntityRenderer.prototype.setElementId = function() {
       return this.el.id = "entity_" + this.entity.id;
     };
     EntityRenderer.prototype.appendToScene = function() {
@@ -767,19 +779,22 @@
       return this.entity.attrs.bind('change', this.set);
     };
     EntityRenderer.prototype.set = function(name, value) {
-      var _ref;
       if (value == null) {
         return;
       }
       if (name === 'position') {
         this.setTitle(value);
       }
-      return _.extend(this.el.style, (_ref = this.css[name]) != null ? _ref.call(this.entity, value) : void 0);
+      return _.extend(this.el.style, this.getCssValue(name, value));
     };
     EntityRenderer.prototype.setTitle = function(pos) {
       if (pos != null) {
         return this.el.title = "[" + pos[0] + ", " + pos[1] + "]";
       }
+    };
+    EntityRenderer.prototype.getCssValue = function(name, value) {
+      var _ref;
+      return (_ref = this.css[name]) != null ? _ref.call(this.entity, value) : void 0;
     };
     EntityRenderer.prototype.css = {
       position: function(p) {
@@ -802,6 +817,23 @@
       z: function(z) {
         return {
           zIndex: z
+        };
+      },
+      background: function(b) {
+        return {
+          backgroundImage: "url(../images/" + b + ")"
+        };
+      },
+      bgRepeat: function(r) {
+        return {
+          backgroundRepeat: (function() {
+            switch (r) {
+              case 'x':
+                return 'repeat-x';
+              case 'y':
+                return 'repeat-y';
+            }
+          })()
         };
       }
     };
@@ -860,6 +892,9 @@
         return this.sceneEl.style.top = "" + top + "px";
       }, this));
     };
+    SceneRenderer.prototype.remove = function() {
+      return this.scene.game.renderer.removeElement(this.wrapper);
+    };
     return SceneRenderer;
   })();
   Awesome.Rendering.GameRenderer = (function() {
@@ -895,6 +930,94 @@
     GameRenderer.prototype.appendElement = function(element) {
       return this.el.appendChild(element);
     };
+    GameRenderer.prototype.removeElement = function(element) {
+      return this.el.removeChild(element);
+    };
     return GameRenderer;
+  })();
+  Awesome.Entities.Text = (function() {
+    var TextRenderer;
+    __extends(Text, Awesome.Entity);
+    function Text() {
+      Text.__super__.constructor.apply(this, arguments);
+    }
+    Text.Renderer = TextRenderer = (function() {
+      __extends(TextRenderer, Awesome.Rendering.EntityRenderer);
+      function TextRenderer() {
+        TextRenderer.__super__.constructor.apply(this, arguments);
+      }
+      TextRenderer.prototype.set = function(name, value) {
+        if (name !== 'text') {
+          return TextRenderer.__super__.set.apply(this, arguments);
+        } else {
+          return this.el.innerHTML = value;
+        }
+      };
+      _.extend(TextRenderer.object('css'), {
+        fontSize: function(s) {
+          return {
+            fontSize: s + "px"
+          };
+        },
+        align: function(a) {
+          return {
+            textAlign: a
+          };
+        }
+      });
+      return TextRenderer;
+    })();
+    Text.prototype.getRenderer = function() {
+      return new Text.Renderer(this);
+    };
+    return Text;
+  }).call(this);
+  Awesome.Entities.Button = (function() {
+    var ButtonRenderer;
+    __extends(Button, Awesome.Entity);
+    function Button() {
+      Button.__super__.constructor.apply(this, arguments);
+    }
+    Button.Renderer = ButtonRenderer = (function() {
+      __extends(ButtonRenderer, Awesome.Rendering.EntityRenderer);
+      function ButtonRenderer() {
+        ButtonRenderer.__super__.constructor.apply(this, arguments);
+      }
+      ButtonRenderer.prototype.createElement = function() {
+        this.el = document.createElement('button');
+        return window.setTimeout((__bind(function() {
+          return this.el.focus();
+        }, this)), 100);
+      };
+      ButtonRenderer.prototype.setImage = function(image) {
+        if (this.image == null) {
+          this.image = document.createElement('img');
+          this.el.appendChild(this.image);
+        }
+        return this.image.src = "../images/" + image;
+      };
+      ButtonRenderer.prototype.set = function(name, value) {
+        switch (name) {
+          case 'text':
+            return this.el.innerHTML = value;
+          case 'image':
+            return this.setImage(value);
+          default:
+            return ButtonRenderer.__super__.set.apply(this, arguments);
+        }
+      };
+      return ButtonRenderer;
+    })();
+    Button.include('Events');
+    Button.tag('button');
+    Button.prototype.getRenderer = function() {
+      var renderer;
+      renderer = new Button.Renderer(this);
+      renderer.el.addEventListener('click', __bind(function() {
+        return this.trigger('click');
+      }, this));
+      return renderer;
+    };
+    return Button;
   })();
 }).call(this);
