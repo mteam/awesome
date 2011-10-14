@@ -325,17 +325,17 @@ PlayerChooser = (function() {
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [250, 180],
-    image: 'characters/Hotass/standing.png'
+    image: 'characters/hotass/standing.png'
   });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [350, 180],
-    image: 'characters/Ninja/standing.png'
+    image: 'characters/ninja/standing.png'
   });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [450, 180],
-    image: 'characters/Pirate/standing.png'
+    image: 'characters/pirate/standing.png'
   });
   PlayerChooser.prototype.runLevel = function(player) {
     return this.game.run('candyLand', player);
@@ -367,7 +367,7 @@ CandyLand = (function() {
     function Land() {
       Land.__super__.constructor.apply(this, arguments);
     }
-    Land.prototype.$background = 'candyland/Map/land.png?1';
+    Land.prototype.$background = 'candyland/map/land.png';
     Land.prototype.$bgRepeat = 'x';
     Land.prototype.$z = 0;
     Land.tag('static');
@@ -379,7 +379,7 @@ CandyLand = (function() {
     function FlyingLand() {
       FlyingLand.__super__.constructor.apply(this, arguments);
     }
-    FlyingLand.prototype.$background = ['candyland/Map/1.png', 'candyland/Map/2.png', 'candyland/Map/3.png'];
+    FlyingLand.prototype.$background = ['candyland/map/1.png', 'candyland/map/2.png', 'candyland/map/3.png'];
     FlyingLand.prototype.$z = 0;
     FlyingLand.tag('static');
     FlyingLand.Renderer = FlyingLandRenderer = (function() {
