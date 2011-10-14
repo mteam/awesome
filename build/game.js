@@ -1,4 +1,4 @@
-var AttentionBar, CandyLand, DeathScreen, Enemy, Game, Hotass, Level, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, game;
+var AttentionBar, CandyLand, End, Enemy, FailScreen, Game, Hotass, Laboratory, Level, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, Tralalalandia, game;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -143,6 +143,26 @@ Enemy = (function() {
   Enemy.prototype.$z = 1;
   return Enemy;
 })();
+End = (function() {
+  __extends(End, Awesome.Entity);
+  End.prototype.$size = [50, 100];
+  End.prototype.$color = 'pink';
+  End.include('Collisions');
+  function End() {
+    End.__super__.constructor.apply(this, arguments);
+    this.bind('tick', this.tick);
+  }
+  End.prototype.tick = function() {
+    var collisions;
+    collisions = this.colliding({
+      "with": 'player'
+    });
+    if (collisions.length) {
+      return this.scene.runNextScene();
+    }
+  };
+  return End;
+})();
 AttentionBar = (function() {
   __extends(AttentionBar, Awesome.Entity);
   AttentionBar.prototype.$growSpeed = 2;
@@ -210,6 +230,7 @@ Menu = (function() {
   function Menu() {
     Menu.__super__.constructor.apply(this, arguments);
   }
+  Menu.prototype.name = 'menu';
   Menu.add(Awesome.Entities.Button, {
     text: 'Start',
     size: [100, 50],
@@ -239,7 +260,7 @@ Level = (function() {
   }
   Level.add(AttentionBar);
   Level.prototype.showDeathScreen = function() {
-    return this.game.run('deathScreen', this.name, this.playerClass);
+    return this.game.run('failScreen', this.name, this.playerClass);
   };
   Level.prototype.run = function(playerClass) {
     this.playerClass = playerClass;
@@ -248,31 +269,33 @@ Level = (function() {
     });
     return this.follow(this.player);
   };
+  Level.prototype.runNextScene = function() {};
   return Level;
 })();
-DeathScreen = (function() {
-  __extends(DeathScreen, Awesome.Scene);
-  function DeathScreen() {
-    DeathScreen.__super__.constructor.apply(this, arguments);
+FailScreen = (function() {
+  __extends(FailScreen, Awesome.Scene);
+  function FailScreen() {
+    FailScreen.__super__.constructor.apply(this, arguments);
   }
-  DeathScreen.add(Awesome.Entities.Text, {
+  FailScreen.prototype.name = 'failScreen';
+  FailScreen.add(Awesome.Entities.Text, {
     text: 'Fail',
     position: [325, 175],
     size: [150, 50],
     fontSize: 30,
     align: 'center'
   });
-  DeathScreen.add(Awesome.Entities.Button, {
+  FailScreen.add(Awesome.Entities.Button, {
     text: 'Restart level',
     position: [325, 250],
     size: [150, 50]
   });
-  DeathScreen.add(Awesome.Entities.Button, {
+  FailScreen.add(Awesome.Entities.Button, {
     text: 'Back to menu',
     position: [325, 320],
     size: [150, 50]
   });
-  DeathScreen.prototype.run = function(fromScene, player) {
+  FailScreen.prototype.run = function(fromScene, player) {
     var buttons;
     this.fromScene = fromScene;
     this.player = player;
@@ -284,13 +307,14 @@ DeathScreen = (function() {
       return this.game.run('menu');
     }, this));
   };
-  return DeathScreen;
+  return FailScreen;
 })();
 PlayerChooser = (function() {
   __extends(PlayerChooser, Awesome.Scene);
   function PlayerChooser() {
     PlayerChooser.__super__.constructor.apply(this, arguments);
   }
+  PlayerChooser.prototype.name = 'playerChooser';
   PlayerChooser.add(Awesome.Entities.Text, {
     size: [200, 50],
     position: [300, 100],
@@ -301,17 +325,17 @@ PlayerChooser = (function() {
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [250, 180],
-    image: 'characters/hotass/standing.png'
+    image: 'characters/Hotass/standing.png'
   });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [350, 180],
-    image: 'characters/ninja/standing.png'
+    image: 'characters/Ninja/standing.png'
   });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [450, 180],
-    image: 'characters/pirate/standing.png'
+    image: 'characters/Pirate/standing.png'
   });
   PlayerChooser.prototype.runLevel = function(player) {
     return this.game.run('candyLand', player);
@@ -457,7 +481,7 @@ CandyLand = (function() {
     });
     Map.add(CandyLand.FlyingLand, {
       position: [440, 200],
-      size: [100, 20]
+      size: [1000, 20]
     });
     Map.add(CandyLand.Tree, {
       position: [600, 260]
@@ -469,19 +493,47 @@ CandyLand = (function() {
       position: [1000, 300]
     });
     Map.add(Enemy, {
-      position: [1300, 10],
+      position: [1300, 250],
       direction: 'left'
+    });
+    Map.add(End, {
+      position: [4500, 250]
     });
     return Map;
   })();
   CandyLand.prototype.$size = [5000, 400];
   CandyLand.prototype.$map = CandyLand.Map;
+  CandyLand.prototype.runNextScene = function() {
+    return this.game.run('tralalalandia', this.playerClass);
+  };
   return CandyLand;
 }).call(this);
+Tralalalandia = (function() {
+  __extends(Tralalalandia, Level);
+  function Tralalalandia() {
+    Tralalalandia.__super__.constructor.apply(this, arguments);
+  }
+  Tralalalandia.prototype.name = 'tralalalandia';
+  Tralalalandia.prototype.runNextScene = function() {
+    return this.game.run('laboratory', this.playerClass);
+  };
+  return Tralalalandia;
+})();
+Laboratory = (function() {
+  __extends(Laboratory, Level);
+  function Laboratory() {
+    Laboratory.__super__.constructor.apply(this, arguments);
+  }
+  Laboratory.prototype.name = 'laboratory';
+  Laboratory.prototype.runNextScene = function() {
+    return this.game.run('winScreen');
+  };
+  return Laboratory;
+})();
 Player = (function() {
   __extends(Player, Awesome.Entity);
   Player.include('Collisions', 'Gravity', 'Walking', 'Jumping', 'Death', 'Crouching', 'Controls');
-  Player.tag('visible');
+  Player.tag('visible', 'player');
   Player.prototype.$z = 1;
   function Player() {
     var bar;
@@ -530,10 +582,12 @@ Game = (function() {
   }
   Game.prototype.$name = 'awesome';
   Game.prototype.$size = [800, 400];
-  Game.addScene('menu', Menu);
-  Game.addScene('candyLand', CandyLand);
-  Game.addScene('deathScreen', DeathScreen);
-  Game.addScene('playerChooser', PlayerChooser);
+  Game.addScene(Menu);
+  Game.addScene(CandyLand);
+  Game.addScene(Tralalalandia);
+  Game.addScene(Laboratory);
+  Game.addScene(FailScreen);
+  Game.addScene(PlayerChooser);
   return Game;
 })();
 game = new Game;
