@@ -22,12 +22,12 @@ Awesome.module 'AI', class
 
         
     walkingCycleChange: ->
-        switch Math.ceil(Math.random() * 3)
+        switch Math.ceil(Math.random() * 12)
             when 1
                 @stopWalking()
                 @startWalking 'left'
             when 2
                 @stopWalking()
                 @startWalking 'right'
-            when 3
+            else
                 @stopWalking()
