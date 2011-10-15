@@ -7,14 +7,26 @@ class AttentionBar extends Awesome.Entity
 
     @tag 'attentionBar'
 
+    @Renderer: class AttentionBarRenderer extends Awesome.Rendering.EntityRenderer    
+        setupStyles: ->
+            super
+
+            @el.style.border = "1px solid gray"
+        
+        appendToScene: ->
+            @entity.scene.renderer.appendElementToWrapper @el
+
+        _.extend @object('css'),
+            attention: (a) ->
+                backgroundImage: "-webkit-gradient(linear, left top, right top, color-stop(#{a / 100}, red), color-stop(#{a / 100}, white))"
+
     constructor: ->
         super
 
         @bind 'tick', @tick
         @attrs.set 'attention', 0
 
-    getRenderer: ->
-        new AttentionBar.Renderer this
+    rendererClass: @Renderer
     
     grow: ->
         @growing = true
@@ -35,18 +47,3 @@ class AttentionBar extends Awesome.Entity
                 @attrs.attention = 0
             else
                 @attrs.attention -= @attrs.fallSpeed
-
-
-
-class AttentionBar.Renderer extends Awesome.Rendering.EntityRenderer    
-    setupStyles: ->
-        super
-
-        @el.style.border = "1px solid gray"
-    
-    appendToScene: ->
-        @entity.scene.renderer.appendElementToWrapper @el
-
-    _(@object('css')).extend
-        attention: (a) ->
-            backgroundImage: "-webkit-gradient(linear, left top, right top, color-stop(#{a / 100}, red), color-stop(#{a / 100}, white))"

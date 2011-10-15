@@ -24,9 +24,13 @@ Awesome.module 'Sight', class
         isPlayer = (entity) -> entity.entity instanceof Player
 
         if _.any seenEntities, isPlayer
-            bar.grow() unless bar.growing
+            unless @spotted
+                @spotted = true
+                @trigger 'playerSpotted'
         else
-            bar.stopGrowing() if bar.growing
+            if @spotted
+                @spotted = false
+                @trigger 'playerGone'
 
     getSeenEntities: (direction) ->
         entitiesInSight = @getEntitiesInSight direction

@@ -52,8 +52,7 @@ class CandyLand extends Level
                     width: s[0] + "px"
                     height: s[1] + "px"
         
-        getRenderer: ->
-            new FlyingLand.Renderer this
+        rendererClass: @Renderer
     
     @Tree: class Tree extends Awesome.Entity
         $background: 'candyland/obstacles/tree.png'
@@ -75,18 +74,60 @@ class CandyLand extends Level
         $z: 2
 
         @tag 'visible'
-
+    
+    @Dadcane: class Dadcane extends Enemy
+        $size: [60, 100]
+        $walkingAnimation:
+            normal:
+                left: ['candyland/monsters/dadcaneL1.png', 'candyland/monsters/dadcaneL2.png']
+                right: ['candyland/monsters/dadcaneR1.png', 'candyland/monsters/dadcaneR2.png']
+            following:
+                left: ['candyland/monsters/dadcaneSL1.png', 'candyland/monsters/dadcaneSL2.png']
+                right: ['candyland/monsters/dadcaneSR1.png', 'candyland/monsters/dadcaneSR2.png']
+    
+    @Fanmallow: class Fanmallow extends Enemy
+        $size: [40, 60]
+        $walkingAnimation:
+            normal:
+                left: ['candyland/monsters/fanmallowL1.png', 'candyland/monsters/fanmallowL2.png']
+                right: ['candyland/monsters/fanmallowR1.png', 'candyland/monsters/fanmallowR2.png']
+            following:
+                left: ['candyland/monsters/fanmallowSL1.png', 'candyland/monsters/fanmallowSL2.png']
+                right: ['candyland/monsters/fanmallowSR1.png', 'candyland/monsters/fanmallowSR2.png']
+    
+    @Grankie: class Grankie extends Enemy
+        $size: [60, 80]
+        $walkingAnimation:
+            normal:
+                left: ['candyland/monsters/grankieL1.png', 'candyland/monsters/grankieL2.png']
+                right: ['candyland/monsters/grankieR1.png', 'candyland/monsters/grankieR2.png']
+            following:
+                left: ['candyland/monsters/grankieSL1.png', 'candyland/monsters/grankieSL2.png']
+                right: ['candyland/monsters/grankieSR1.png', 'candyland/monsters/grankieSR2.png']
+    
+    @Momonut: class Momonut extends Enemy
+        $size: [60, 80]
+        $walkingAnimation:
+            normal:
+                left: ['candyland/monsters/momonutL1.png', 'candyland/monsters/momonutL2.png']
+                right: ['candyland/monsters/momonutR1.png', 'candyland/monsters/momonutR2.png']
+            following:
+                left: ['candyland/monsters/momonutSL1.png', 'candyland/monsters/momonutSL2.png']
+                right: ['candyland/monsters/momonutSR1.png', 'candyland/monsters/momonutSR2.png']
+    
     @Map: class Map extends Awesome.Map
         @add CandyLand.Land, position: [0, 350], size: [5000, 40]
         @add CandyLand.FlyingLand, position: [200, 300], size: [100, 20]
         @add CandyLand.FlyingLand, position: [320, 250], size: [100, 20]
-        @add CandyLand.FlyingLand, position: [440, 200], size: [1000, 20]
+        @add CandyLand.FlyingLand, position: [440, 200], size: [1500, 20]
 
         @add CandyLand.Tree, position: [600, 260]
         @add CandyLand.TallGrass, position: [1200, 300]
         @add CandyLand.Rock, position: [1000, 300]
 
-        @add Enemy, position: [1300, 250], direction: 'left'
+        @add Dadcane, position: [1300, 250], direction: 'left'
+        @add Fanmallow, position: [1400, 250], direction: 'left'
+        @add Grankie, position: [1500, 250], direction: 'left'
 
         @add End, position: [4500, 250]
     

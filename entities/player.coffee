@@ -9,8 +9,8 @@ class Player extends Awesome.Entity
     constructor: ->
         super
 
-        bar = @scene.getEntitiesByTag('attentionBar')[0]
-        bar.bind 'full', => @die()
+        #bar = @scene.getEntitiesByTag('attentionBar')[0]
+        #bar.bind 'full', => @die()
 
     die: ->
         @scene.showDeathScreen()

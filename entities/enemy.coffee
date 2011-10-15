@@ -1,8 +1,8 @@
 class Enemy extends Awesome.Entity
-    @include 'Collisions', 'Gravity', 'Walking', 'AI', 'Sight'
+    @include 'Collisions', 'Gravity', 'Walking', 'AI', 'Sight', 'WalkingAnimation'
     
     @tag 'visible', 'enemy'
 
-    $color: 'red'
-    $size: [40, 80]
     $z: 1
+    $bgRepeat: 'no'
+    $direction: 'left'

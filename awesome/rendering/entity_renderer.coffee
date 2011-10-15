@@ -56,5 +56,6 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
                 switch r
                     when 'x' then 'repeat-x'
                     when 'y' then 'repeat-y'
+                    when 'no' then 'no-repeat'
 
         

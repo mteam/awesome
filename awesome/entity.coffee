@@ -15,11 +15,13 @@ class Awesome.Entity extends Awesome.Object
         super
         
         @id = entityIdCounter++
-        @renderer = @getRenderer()
+        @setupRenderer()
         @scene.game.timer.bind 'tick', => @trigger 'tick'
     
-    getRenderer: ->
-        new Awesome.Rendering.EntityRenderer this
+    setupRenderer: ->
+        @renderer = new @rendererClass this
+    
+    rendererClass: Awesome.Rendering.EntityRenderer
     
     getRect: ->
         @rect ?= new Awesome.Collisions.EntityRect this

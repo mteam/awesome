@@ -2,7 +2,7 @@ Awesome.module 'Walking', class
     @init: ->
         @bind 'tick', @::tick
     
-    $speed: 5
+    $speed: 8
     $direction: 'right'
     
     startWalking: (direction) ->
@@ -22,14 +22,6 @@ Awesome.module 'Walking', class
     
     tick: ->
         if @walking
-            # collisions = @colliding with: 'static', from: ['left', 'right']
-            # if collisions.length
-            #     if @walking is 'left'
-            #         @attrs.position[0] += collisions[0].overlap[0]
-            #     if @walking is 'right'
-            #         @attrs.position[0] -= collisions[0].overlap[0]
-            #     @stopWalking()
-            # else
             if @walking is 'left'
                 @attrs.position[0] -= @attrs.speed
             if @walking is 'right'

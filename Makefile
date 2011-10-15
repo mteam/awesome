@@ -6,10 +6,12 @@ awesome-scripts =   awesome/underscore.coffee awesome/awesome.coffee awesome/obj
 					awesome/modules/gravity.coffee awesome/modules/collisions.coffee \
 					awesome/modules/jumping.coffee awesome/modules/crouching.coffee \
 					awesome/modules/walking.coffee awesome/modules/controls.coffee \
+					awesome/modules/walking_animation.coffee \
+					awesome/rendering/entity_renderer.coffee awesome/rendering/scene_renderer.coffee \
+                    awesome/rendering/game_renderer.coffee \
 					awesome/attribute_container.coffee awesome/entity.coffee awesome/timer.coffee \
                     awesome/scene.coffee awesome/game.coffee awesome/map.coffee \
-                    awesome/rendering/entity_renderer.coffee awesome/rendering/scene_renderer.coffee \
-                    awesome/rendering/game_renderer.coffee awesome/entities/text.coffee \
+                    awesome/entities/text.coffee \
                     awesome/entities/button.coffee
 
 game-scripts =      modules/ai.coffee modules/sight.coffee modules/death.coffee \

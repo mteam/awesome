@@ -12,5 +12,4 @@ class Awesome.Entities.Text extends Awesome.Entity
             align: (a) ->
                 textAlign: a
 
-    getRenderer: ->
-        new Text.Renderer this
+    rendererClass: @Renderer

@@ -19,8 +19,11 @@ class Awesome.Entities.Button extends Awesome.Entity
     
     @include 'Events'
     @tag 'button'
+
+    rendererClass: @Renderer
     
-    getRenderer: ->
-        renderer = new Button.Renderer this
-        renderer.el.addEventListener 'click', => @trigger 'click'
-        renderer
+    setupRenderer: ->
+        super
+
+        @renderer.el.addEventListener 'click', => @trigger 'click'
+        @renderer

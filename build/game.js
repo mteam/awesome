@@ -9,6 +9,42 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
 }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 Awesome.module('AI', (function() {
   function _Class() {}
+  _Class.init = function() {
+    this.bind('tick', this.prototype.tick);
+    this.bind('playerSpotted', this.prototype.playerSpotted);
+    return this.bind('playerGone', this.prototype.playerGone);
+  };
+  _Class.prototype.playerSpotted = function() {
+    return this.startWalking(this.attrs.direction);
+  };
+  _Class.prototype.playerGone = function() {
+    return this.stopWalking();
+  };
+  _Class.prototype.tick = function() {
+    var _ref;
+    if ((_ref = this.walkingCycleCounter) == null) {
+      this.walkingCycleCounter = 0;
+    }
+    if (!this.spotted) {
+      this.walkingCycleCounter++;
+      if (this.walkingCycleCounter > 10) {
+        this.walkingCycleCounter = 0;
+        return this.walkingCycleChange();
+      }
+    }
+  };
+  _Class.prototype.walkingCycleChange = function() {
+    switch (Math.ceil(Math.random() * 3)) {
+      case 1:
+        this.stopWalking();
+        return this.startWalking('left');
+      case 2:
+        this.stopWalking();
+        return this.startWalking('right');
+      case 3:
+        return this.stopWalking();
+    }
+  };
   return _Class;
 })());
 SightRect = (function() {
@@ -55,12 +91,14 @@ Awesome.module('Sight', (function() {
       return entity.entity instanceof Player;
     };
     if (_.any(seenEntities, isPlayer)) {
-      if (!bar.growing) {
-        return bar.grow();
+      if (!this.spotted) {
+        this.spotted = true;
+        return this.trigger('playerSpotted');
       }
     } else {
-      if (bar.growing) {
-        return bar.stopGrowing();
+      if (this.spotted) {
+        this.spotted = false;
+        return this.trigger('playerGone');
       }
     }
   };
@@ -136,11 +174,11 @@ Enemy = (function() {
   function Enemy() {
     Enemy.__super__.constructor.apply(this, arguments);
   }
-  Enemy.include('Collisions', 'Gravity', 'Walking', 'AI', 'Sight');
+  Enemy.include('Collisions', 'Gravity', 'Walking', 'AI', 'Sight', 'WalkingAnimation');
   Enemy.tag('visible', 'enemy');
-  Enemy.prototype.$color = 'red';
-  Enemy.prototype.$size = [40, 80];
   Enemy.prototype.$z = 1;
+  Enemy.prototype.$bgRepeat = 'no';
+  Enemy.prototype.$direction = 'left';
   return Enemy;
 })();
 End = (function() {
@@ -164,6 +202,7 @@ End = (function() {
   return End;
 })();
 AttentionBar = (function() {
+  var AttentionBarRenderer;
   __extends(AttentionBar, Awesome.Entity);
   AttentionBar.prototype.$growSpeed = 2;
   AttentionBar.prototype.$fallSpeed = 0.2;
@@ -171,14 +210,33 @@ AttentionBar = (function() {
   AttentionBar.prototype.$size = [200, 10];
   AttentionBar.prototype.$z = 10;
   AttentionBar.tag('attentionBar');
+  AttentionBar.Renderer = AttentionBarRenderer = (function() {
+    __extends(AttentionBarRenderer, Awesome.Rendering.EntityRenderer);
+    function AttentionBarRenderer() {
+      AttentionBarRenderer.__super__.constructor.apply(this, arguments);
+    }
+    AttentionBarRenderer.prototype.setupStyles = function() {
+      AttentionBarRenderer.__super__.setupStyles.apply(this, arguments);
+      return this.el.style.border = "1px solid gray";
+    };
+    AttentionBarRenderer.prototype.appendToScene = function() {
+      return this.entity.scene.renderer.appendElementToWrapper(this.el);
+    };
+    _.extend(AttentionBarRenderer.object('css'), {
+      attention: function(a) {
+        return {
+          backgroundImage: "-webkit-gradient(linear, left top, right top, color-stop(" + (a / 100) + ", red), color-stop(" + (a / 100) + ", white))"
+        };
+      }
+    });
+    return AttentionBarRenderer;
+  })();
   function AttentionBar() {
     AttentionBar.__super__.constructor.apply(this, arguments);
     this.bind('tick', this.tick);
     this.attrs.set('attention', 0);
   }
-  AttentionBar.prototype.getRenderer = function() {
-    return new AttentionBar.Renderer(this);
-  };
+  AttentionBar.prototype.rendererClass = AttentionBar.Renderer;
   AttentionBar.prototype.grow = function() {
     return this.growing = true;
   };
@@ -203,28 +261,7 @@ AttentionBar = (function() {
     }
   };
   return AttentionBar;
-})();
-AttentionBar.Renderer = (function() {
-  __extends(Renderer, Awesome.Rendering.EntityRenderer);
-  function Renderer() {
-    Renderer.__super__.constructor.apply(this, arguments);
-  }
-  Renderer.prototype.setupStyles = function() {
-    Renderer.__super__.setupStyles.apply(this, arguments);
-    return this.el.style.border = "1px solid gray";
-  };
-  Renderer.prototype.appendToScene = function() {
-    return this.entity.scene.renderer.appendElementToWrapper(this.el);
-  };
-  _(Renderer.object('css')).extend({
-    attention: function(a) {
-      return {
-        backgroundImage: "-webkit-gradient(linear, left top, right top, color-stop(" + (a / 100) + ", red), color-stop(" + (a / 100) + ", white))"
-      };
-    }
-  });
-  return Renderer;
-})();
+}).call(this);
 Menu = (function() {
   __extends(Menu, Awesome.Scene);
   function Menu() {
@@ -258,7 +295,6 @@ Level = (function() {
   function Level() {
     Level.__super__.constructor.apply(this, arguments);
   }
-  Level.add(AttentionBar);
   Level.prototype.showDeathScreen = function() {
     return this.game.run('failScreen', this.name, this.playerClass);
   };
@@ -356,7 +392,7 @@ PlayerChooser = (function() {
   return PlayerChooser;
 })();
 CandyLand = (function() {
-  var FlyingLand, Land, Map, Rock, TallGrass, Tree;
+  var Dadcane, Fanmallow, FlyingLand, Grankie, Land, Map, Momonut, Rock, TallGrass, Tree;
   __extends(CandyLand, Level);
   function CandyLand() {
     CandyLand.__super__.constructor.apply(this, arguments);
@@ -424,9 +460,7 @@ CandyLand = (function() {
       });
       return FlyingLandRenderer;
     })();
-    FlyingLand.prototype.getRenderer = function() {
-      return new FlyingLand.Renderer(this);
-    };
+    FlyingLand.prototype.rendererClass = FlyingLand.Renderer;
     return FlyingLand;
   }).call(this);
   CandyLand.Tree = Tree = (function() {
@@ -462,6 +496,78 @@ CandyLand = (function() {
     Rock.tag('visible');
     return Rock;
   })();
+  CandyLand.Dadcane = Dadcane = (function() {
+    __extends(Dadcane, Enemy);
+    function Dadcane() {
+      Dadcane.__super__.constructor.apply(this, arguments);
+    }
+    Dadcane.prototype.$size = [60, 100];
+    Dadcane.prototype.$walkingAnimation = {
+      normal: {
+        left: ['candyland/monsters/dadcaneL1.png', 'candyland/monsters/dadcaneL2.png'],
+        right: ['candyland/monsters/dadcaneR1.png', 'candyland/monsters/dadcaneR2.png']
+      },
+      following: {
+        left: ['candyland/monsters/dadcaneSL1.png', 'candyland/monsters/dadcaneSL2.png'],
+        right: ['candyland/monsters/dadcaneSR1.png', 'candyland/monsters/dadcaneSR2.png']
+      }
+    };
+    return Dadcane;
+  })();
+  CandyLand.Fanmallow = Fanmallow = (function() {
+    __extends(Fanmallow, Enemy);
+    function Fanmallow() {
+      Fanmallow.__super__.constructor.apply(this, arguments);
+    }
+    Fanmallow.prototype.$size = [40, 60];
+    Fanmallow.prototype.$walkingAnimation = {
+      normal: {
+        left: ['candyland/monsters/fanmallowL1.png', 'candyland/monsters/fanmallowL2.png'],
+        right: ['candyland/monsters/fanmallowR1.png', 'candyland/monsters/fanmallowR2.png']
+      },
+      following: {
+        left: ['candyland/monsters/fanmallowSL1.png', 'candyland/monsters/fanmallowSL2.png'],
+        right: ['candyland/monsters/fanmallowSR1.png', 'candyland/monsters/fanmallowSR2.png']
+      }
+    };
+    return Fanmallow;
+  })();
+  CandyLand.Grankie = Grankie = (function() {
+    __extends(Grankie, Enemy);
+    function Grankie() {
+      Grankie.__super__.constructor.apply(this, arguments);
+    }
+    Grankie.prototype.$size = [60, 80];
+    Grankie.prototype.$walkingAnimation = {
+      normal: {
+        left: ['candyland/monsters/grankieL1.png', 'candyland/monsters/grankieL2.png'],
+        right: ['candyland/monsters/grankieR1.png', 'candyland/monsters/grankieR2.png']
+      },
+      following: {
+        left: ['candyland/monsters/grankieSL1.png', 'candyland/monsters/grankieSL2.png'],
+        right: ['candyland/monsters/grankieSR1.png', 'candyland/monsters/grankieSR2.png']
+      }
+    };
+    return Grankie;
+  })();
+  CandyLand.Momonut = Momonut = (function() {
+    __extends(Momonut, Enemy);
+    function Momonut() {
+      Momonut.__super__.constructor.apply(this, arguments);
+    }
+    Momonut.prototype.$size = [60, 80];
+    Momonut.prototype.$walkingAnimation = {
+      normal: {
+        left: ['candyland/monsters/momonutL1.png', 'candyland/monsters/momonutL2.png'],
+        right: ['candyland/monsters/momonutR1.png', 'candyland/monsters/momonutR2.png']
+      },
+      following: {
+        left: ['candyland/monsters/momonutSL1.png', 'candyland/monsters/momonutSL2.png'],
+        right: ['candyland/monsters/momonutSR1.png', 'candyland/monsters/momonutSR2.png']
+      }
+    };
+    return Momonut;
+  })();
   CandyLand.Map = Map = (function() {
     __extends(Map, Awesome.Map);
     function Map() {
@@ -481,7 +587,7 @@ CandyLand = (function() {
     });
     Map.add(CandyLand.FlyingLand, {
       position: [440, 200],
-      size: [1000, 20]
+      size: [1500, 20]
     });
     Map.add(CandyLand.Tree, {
       position: [600, 260]
@@ -492,8 +598,16 @@ CandyLand = (function() {
     Map.add(CandyLand.Rock, {
       position: [1000, 300]
     });
-    Map.add(Enemy, {
+    Map.add(Dadcane, {
       position: [1300, 250],
+      direction: 'left'
+    });
+    Map.add(Fanmallow, {
+      position: [1400, 250],
+      direction: 'left'
+    });
+    Map.add(Grankie, {
+      position: [1500, 250],
       direction: 'left'
     });
     Map.add(End, {
@@ -536,12 +650,7 @@ Player = (function() {
   Player.tag('visible', 'player');
   Player.prototype.$z = 1;
   function Player() {
-    var bar;
     Player.__super__.constructor.apply(this, arguments);
-    bar = this.scene.getEntitiesByTag('attentionBar')[0];
-    bar.bind('full', __bind(function() {
-      return this.die();
-    }, this));
   }
   Player.prototype.die = function() {
     return this.scene.showDeathScreen();
@@ -555,6 +664,8 @@ Ninja = (function() {
   }
   Ninja.prototype.$size = [40, 80];
   Ninja.prototype.$color = 'black';
+  Ninja.prototype.$jump = 13;
+  Ninja.prototype.$speed = 12;
   return Ninja;
 })();
 Hotass = (function() {

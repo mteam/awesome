@@ -24,7 +24,7 @@ class Awesome.AttributeContainer extends Awesome.Object
             @set name.substr(1), property
     
     set: (name, value) ->
-        @setupProperty name unless @[name]?
+        @setupProperty name unless @hasOwnProperty name
         @[name] = value
     
     setupProperty: (name) ->

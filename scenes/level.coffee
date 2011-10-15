@@ -1,5 +1,5 @@
 class Level extends Awesome.Scene
-    @add AttentionBar
+    #@add AttentionBar
 
     showDeathScreen: ->
         @game.run 'failScreen', @name, @playerClass
