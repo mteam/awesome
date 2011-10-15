@@ -339,7 +339,7 @@
     _Class.init = function() {
       return this.bind('tick', this.prototype.tick);
     };
-    _Class.prototype.gravity = 0.4;
+    _Class.prototype.gravity = 0.8;
     _Class.prototype.tick = function() {
       var collisions, _ref;
       if ((_ref = this.gravitySpeed) == null) {
@@ -396,7 +396,7 @@
       this.bind('tick', this.prototype.tick);
       return this.bind('fall', this.prototype.stopJumping);
     };
-    _Class.prototype.$jump = 7;
+    _Class.prototype.$jump = 9;
     _Class.prototype.jump = function() {
       this.jumping = true;
       return this.trigger('jump');
@@ -439,7 +439,7 @@
     _Class.init = function() {
       return this.bind('tick', this.prototype.tick);
     };
-    _Class.prototype.$speed = 5;
+    _Class.prototype.$speed = 8;
     _Class.prototype.$direction = 'right';
     _Class.prototype.startWalking = function(direction) {
       switch (direction) {
@@ -498,6 +498,267 @@
     };
     return _Class;
   })());
+  Awesome.module('WalkingAnimation', (function() {
+    _Class.init = function() {
+      this.bind('tick', this.prototype.tick);
+      this.bind('startWalking', this.prototype.startWalkingAnimation);
+      this.bind('stopWalking', this.prototype.stopWalkingAnimation);
+      this.bind('playerSpotted', this.prototype.setSpottedWalkingAnimation);
+      return this.bind('playerGone', this.prototype.setNormalWalkingAnimation);
+    };
+    function _Class() {
+      this.setNormalWalkingAnimation();
+      this.resetAnimation();
+    }
+    _Class.prototype.startWalkingAnimation = function(direction) {
+      return this.resetAnimation(direction);
+    };
+    _Class.prototype.resetAnimation = function(direction) {
+      if (direction == null) {
+        direction = this.attrs.direction;
+      }
+      return this.attrs.set('background', this.walkingAnimations[direction][1]);
+    };
+    _Class.prototype.stopWalkingAnimation = function() {
+      return this.resetAnimation();
+    };
+    _Class.prototype.setSpottedWalkingAnimation = function() {
+      return this.walkingAnimations = this.attrs.walkingAnimation.following;
+    };
+    _Class.prototype.setNormalWalkingAnimation = function() {
+      this.walkingAnimations = this.attrs.walkingAnimation.normal;
+      return this.resetAnimation();
+    };
+    _Class.prototype.tick = function() {
+      var index;
+      if (this.walking) {
+        index = this.getAnimationIndex();
+        return this.attrs.background = this.walkingAnimations[this.attrs.direction][index];
+      }
+    };
+    _Class.prototype.getAnimationIndex = function() {
+      var _ref, _ref2, _ref3;
+      if ((_ref = this.animIndex) == null) {
+        this.animIndex = 0;
+      }
+      if ((_ref2 = this.maxAnimIndex) == null) {
+        this.maxAnimIndex = this.attrs.walkingAnimation.normal.left.length - 1;
+      }
+      if ((_ref3 = this.animCounter) == null) {
+        this.animCounter = 0;
+      }
+      if (this.animCounter > (this.attrs.walkAnimationSpeed || 1)) {
+        if (this.animIndex + 1 > this.maxAnimIndex) {
+          this.animIndex = 0;
+        } else {
+          this.animIndex++;
+        }
+        this.animCounter = 0;
+      } else {
+        this.animCounter++;
+      }
+      return this.animIndex;
+    };
+    return _Class;
+  })());
+  Awesome.Rendering.EntityRenderer = (function() {
+    __extends(EntityRenderer, Awesome.Object);
+    function EntityRenderer(entity) {
+      this.entity = entity;
+      this.set = __bind(this.set, this);
+      this.createElement();
+      this.setElementId();
+      this.appendToScene();
+      this.setupStyles();
+      this.bind();
+    }
+    EntityRenderer.prototype.createElement = function() {
+      return this.el = document.createElement('div');
+    };
+    EntityRenderer.prototype.setElementId = function() {
+      return this.el.id = "entity_" + this.entity.id;
+    };
+    EntityRenderer.prototype.appendToScene = function() {
+      return this.entity.scene.renderer.appendElement(this.el);
+    };
+    EntityRenderer.prototype.setupStyles = function() {
+      var name, value, _ref, _results;
+      this.el.style.position = 'absolute';
+      _ref = this.entity.attrs;
+      _results = [];
+      for (name in _ref) {
+        value = _ref[name];
+        _results.push(this.set(name, value));
+      }
+      return _results;
+    };
+    EntityRenderer.prototype.bind = function() {
+      return this.entity.attrs.bind('change', this.set);
+    };
+    EntityRenderer.prototype.set = function(name, value) {
+      if (value == null) {
+        return;
+      }
+      if (name === 'position') {
+        this.setTitle(value);
+      }
+      return _.extend(this.el.style, this.getCssValue(name, value));
+    };
+    EntityRenderer.prototype.setTitle = function(pos) {
+      if (pos != null) {
+        return this.el.title = "[" + pos[0] + ", " + pos[1] + "]";
+      }
+    };
+    EntityRenderer.prototype.getCssValue = function(name, value) {
+      var _ref;
+      return (_ref = this.css[name]) != null ? _ref.call(this.entity, value) : void 0;
+    };
+    EntityRenderer.prototype.css = {
+      position: function(p) {
+        return {
+          left: p[0] + "px",
+          top: p[1] + "px"
+        };
+      },
+      size: function(s) {
+        return {
+          width: s[0] + "px",
+          height: s[1] + "px"
+        };
+      },
+      color: function(c) {
+        return {
+          backgroundColor: c
+        };
+      },
+      z: function(z) {
+        return {
+          zIndex: z
+        };
+      },
+      background: function(b) {
+        return {
+          backgroundImage: "url(../images/" + b + ")"
+        };
+      },
+      bgRepeat: function(r) {
+        return {
+          backgroundRepeat: (function() {
+            switch (r) {
+              case 'x':
+                return 'repeat-x';
+              case 'y':
+                return 'repeat-y';
+              case 'no':
+                return 'no-repeat';
+            }
+          })()
+        };
+      }
+    };
+    return EntityRenderer;
+  })();
+  Awesome.Rendering.SceneRenderer = (function() {
+    __extends(SceneRenderer, Awesome.Object);
+    function SceneRenderer(scene) {
+      this.scene = scene;
+      this.createElement();
+      this.appendToGame();
+      this.sceneEl.addEventListener('click', function(e) {
+        if (e.button === 1) {
+          return console.log("[" + e.offsetX + ", " + e.offsetY + "]");
+        }
+      });
+    }
+    SceneRenderer.prototype.createElement = function() {
+      this.createWrapper();
+      return this.createScene();
+    };
+    SceneRenderer.prototype.createWrapper = function() {
+      this.wrapper = document.createElement('div');
+      this.wrapper.id = "scene_" + this.scene.name;
+      return _.extend(this.wrapper.style, {
+        width: "100%",
+        height: "100%",
+        position: "relative"
+      });
+    };
+    SceneRenderer.prototype.createScene = function() {
+      this.sceneEl = document.createElement('div');
+      this.wrapper.appendChild(this.sceneEl);
+      return _.extend(this.sceneEl.style, {
+        width: this.scene.attrs.size[0] + "px",
+        height: this.scene.attrs.size[1] + "px",
+        left: "0px",
+        top: "0px",
+        position: "absolute",
+        overflow: "hidden"
+      });
+    };
+    SceneRenderer.prototype.appendToGame = function() {
+      return this.scene.game.renderer.appendElement(this.wrapper);
+    };
+    SceneRenderer.prototype.appendElement = function(element) {
+      return this.sceneEl.appendChild(element);
+    };
+    SceneRenderer.prototype.appendElementToWrapper = function(element) {
+      return this.wrapper.appendChild(element);
+    };
+    SceneRenderer.prototype.follow = function(entity) {
+      return entity.attrs.bind('change', __bind(function(name, value) {
+        var left, top;
+        if (name !== 'position') {
+          return;
+        }
+        left = this.scene.game.attrs.size[0] / 2 - value[0];
+        top = this.scene.game.attrs.size[1] / 2 - value[1];
+        this.sceneEl.style.left = "" + left + "px";
+        return this.sceneEl.style.top = "" + top + "px";
+      }, this));
+    };
+    SceneRenderer.prototype.remove = function() {
+      return this.scene.game.renderer.removeElement(this.wrapper);
+    };
+    return SceneRenderer;
+  })();
+  Awesome.Rendering.GameRenderer = (function() {
+    __extends(GameRenderer, Awesome.Object);
+    function GameRenderer(game) {
+      this.game = game;
+      this.createElement();
+      this.appendElementToBody();
+    }
+    GameRenderer.prototype.createElement = function() {
+      this.el = document.createElement('div');
+      this.el.id = this.game.attrs.name;
+      return _.extend(this.el.style, {
+        width: this.game.attrs.size[0] + "px",
+        height: this.game.attrs.size[1] + "px",
+        overflow: 'hidden',
+        position: 'relative'
+      });
+    };
+    GameRenderer.prototype.appendElementToBody = function() {
+      var append, bind, el;
+      el = this.el;
+      append = function() {
+        return document.body.appendChild(el);
+      };
+      bind = window.addEventListener || window.attachEvent;
+      if (document.body != null) {
+        return append();
+      } else {
+        return bind('load', append, false);
+      }
+    };
+    GameRenderer.prototype.appendElement = function(element) {
+      return this.el.appendChild(element);
+    };
+    GameRenderer.prototype.removeElement = function(element) {
+      return this.el.removeChild(element);
+    };
+    return GameRenderer;
+  })();
   FakeArray = (function() {
     function FakeArray(realArray, callback) {
       var key, value, _len, _ref;
@@ -549,7 +810,7 @@
       }
     }
     AttributeContainer.prototype.set = function(name, value) {
-      if (this[name] == null) {
+      if (!this.hasOwnProperty(name)) {
         this.setupProperty(name);
       }
       return this[name] = value;
@@ -595,14 +856,15 @@
       this.scene = scene;
       Entity.__super__.constructor.apply(this, arguments);
       this.id = entityIdCounter++;
-      this.renderer = this.getRenderer();
+      this.setupRenderer();
       this.scene.game.timer.bind('tick', __bind(function() {
         return this.trigger('tick');
       }, this));
     }
-    Entity.prototype.getRenderer = function() {
-      return new Awesome.Rendering.EntityRenderer(this);
+    Entity.prototype.setupRenderer = function() {
+      return this.renderer = new this.rendererClass(this);
     };
+    Entity.prototype.rendererClass = Awesome.Rendering.EntityRenderer;
     Entity.prototype.getRect = function() {
       var _ref;
       return (_ref = this.rect) != null ? _ref : this.rect = new Awesome.Collisions.EntityRect(this);
@@ -614,7 +876,7 @@
     __extends(Timer, Awesome.Object);
     Timer.include('Events');
     function Timer(fps) {
-      this.fps = fps != null ? fps : 60;
+      this.fps = fps != null ? fps : 30;
       this.tick = __bind(this.tick, this);
     }
     Timer.prototype.tick = function() {
@@ -744,202 +1006,6 @@
     };
     return Map;
   })();
-  Awesome.Rendering.EntityRenderer = (function() {
-    __extends(EntityRenderer, Awesome.Object);
-    function EntityRenderer(entity) {
-      this.entity = entity;
-      this.set = __bind(this.set, this);
-      this.createElement();
-      this.setElementId();
-      this.appendToScene();
-      this.setupStyles();
-      this.bind();
-    }
-    EntityRenderer.prototype.createElement = function() {
-      return this.el = document.createElement('div');
-    };
-    EntityRenderer.prototype.setElementId = function() {
-      return this.el.id = "entity_" + this.entity.id;
-    };
-    EntityRenderer.prototype.appendToScene = function() {
-      return this.entity.scene.renderer.appendElement(this.el);
-    };
-    EntityRenderer.prototype.setupStyles = function() {
-      var name, value, _ref, _results;
-      this.el.style.position = 'absolute';
-      _ref = this.entity.attrs;
-      _results = [];
-      for (name in _ref) {
-        value = _ref[name];
-        _results.push(this.set(name, value));
-      }
-      return _results;
-    };
-    EntityRenderer.prototype.bind = function() {
-      return this.entity.attrs.bind('change', this.set);
-    };
-    EntityRenderer.prototype.set = function(name, value) {
-      if (value == null) {
-        return;
-      }
-      if (name === 'position') {
-        this.setTitle(value);
-      }
-      return _.extend(this.el.style, this.getCssValue(name, value));
-    };
-    EntityRenderer.prototype.setTitle = function(pos) {
-      if (pos != null) {
-        return this.el.title = "[" + pos[0] + ", " + pos[1] + "]";
-      }
-    };
-    EntityRenderer.prototype.getCssValue = function(name, value) {
-      var _ref;
-      return (_ref = this.css[name]) != null ? _ref.call(this.entity, value) : void 0;
-    };
-    EntityRenderer.prototype.css = {
-      position: function(p) {
-        return {
-          left: p[0] + "px",
-          top: p[1] + "px"
-        };
-      },
-      size: function(s) {
-        return {
-          width: s[0] + "px",
-          height: s[1] + "px"
-        };
-      },
-      color: function(c) {
-        return {
-          backgroundColor: c
-        };
-      },
-      z: function(z) {
-        return {
-          zIndex: z
-        };
-      },
-      background: function(b) {
-        return {
-          backgroundImage: "url(../images/" + b + ")"
-        };
-      },
-      bgRepeat: function(r) {
-        return {
-          backgroundRepeat: (function() {
-            switch (r) {
-              case 'x':
-                return 'repeat-x';
-              case 'y':
-                return 'repeat-y';
-            }
-          })()
-        };
-      }
-    };
-    return EntityRenderer;
-  })();
-  Awesome.Rendering.SceneRenderer = (function() {
-    __extends(SceneRenderer, Awesome.Object);
-    function SceneRenderer(scene) {
-      this.scene = scene;
-      this.createElement();
-      this.appendToGame();
-      this.sceneEl.addEventListener('click', function(e) {
-        if (e.button === 1) {
-          return console.log("[" + e.offsetX + ", " + e.offsetY + "]");
-        }
-      });
-    }
-    SceneRenderer.prototype.createElement = function() {
-      this.createWrapper();
-      return this.createScene();
-    };
-    SceneRenderer.prototype.createWrapper = function() {
-      this.wrapper = document.createElement('div');
-      this.wrapper.id = "scene_" + this.scene.name;
-      return _.extend(this.wrapper.style, {
-        width: "100%",
-        height: "100%",
-        position: "relative"
-      });
-    };
-    SceneRenderer.prototype.createScene = function() {
-      this.sceneEl = document.createElement('div');
-      this.wrapper.appendChild(this.sceneEl);
-      return _.extend(this.sceneEl.style, {
-        width: this.scene.attrs.size[0] + "px",
-        height: this.scene.attrs.size[1] + "px",
-        left: "0px",
-        top: "0px",
-        position: "absolute",
-        overflow: "hidden"
-      });
-    };
-    SceneRenderer.prototype.appendToGame = function() {
-      return this.scene.game.renderer.appendElement(this.wrapper);
-    };
-    SceneRenderer.prototype.appendElement = function(element) {
-      return this.sceneEl.appendChild(element);
-    };
-    SceneRenderer.prototype.appendElementToWrapper = function(element) {
-      return this.wrapper.appendChild(element);
-    };
-    SceneRenderer.prototype.follow = function(entity) {
-      return entity.attrs.bind('change', __bind(function(name, value) {
-        var left, top;
-        if (name !== 'position') {
-          return;
-        }
-        left = this.scene.game.attrs.size[0] / 2 - value[0];
-        top = this.scene.game.attrs.size[1] / 2 - value[1];
-        this.sceneEl.style.left = "" + left + "px";
-        return this.sceneEl.style.top = "" + top + "px";
-      }, this));
-    };
-    SceneRenderer.prototype.remove = function() {
-      return this.scene.game.renderer.removeElement(this.wrapper);
-    };
-    return SceneRenderer;
-  })();
-  Awesome.Rendering.GameRenderer = (function() {
-    __extends(GameRenderer, Awesome.Object);
-    function GameRenderer(game) {
-      this.game = game;
-      this.createElement();
-      this.appendElementToBody();
-    }
-    GameRenderer.prototype.createElement = function() {
-      this.el = document.createElement('div');
-      this.el.id = this.game.attrs.name;
-      return _.extend(this.el.style, {
-        width: this.game.attrs.size[0] + "px",
-        height: this.game.attrs.size[1] + "px",
-        overflow: 'hidden',
-        position: 'relative'
-      });
-    };
-    GameRenderer.prototype.appendElementToBody = function() {
-      var append, bind, el;
-      el = this.el;
-      append = function() {
-        return document.body.appendChild(el);
-      };
-      bind = window.addEventListener || window.attachEvent;
-      if (document.body != null) {
-        return append();
-      } else {
-        return bind('load', append, false);
-      }
-    };
-    GameRenderer.prototype.appendElement = function(element) {
-      return this.el.appendChild(element);
-    };
-    GameRenderer.prototype.removeElement = function(element) {
-      return this.el.removeChild(element);
-    };
-    return GameRenderer;
-  })();
   Awesome.Entities.Text = (function() {
     var TextRenderer;
     __extends(Text, Awesome.Entity);
@@ -972,9 +1038,7 @@
       });
       return TextRenderer;
     })();
-    Text.prototype.getRenderer = function() {
-      return new Text.Renderer(this);
-    };
+    Text.prototype.rendererClass = Text.Renderer;
     return Text;
   }).call(this);
   Awesome.Entities.Button = (function() {
@@ -1015,13 +1079,13 @@
     })();
     Button.include('Events');
     Button.tag('button');
-    Button.prototype.getRenderer = function() {
-      var renderer;
-      renderer = new Button.Renderer(this);
-      renderer.el.addEventListener('click', __bind(function() {
+    Button.prototype.rendererClass = Button.Renderer;
+    Button.prototype.setupRenderer = function() {
+      Button.__super__.setupRenderer.apply(this, arguments);
+      this.renderer.el.addEventListener('click', __bind(function() {
         return this.trigger('click');
       }, this));
-      return renderer;
+      return this.renderer;
     };
     return Button;
   })();
