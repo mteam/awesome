@@ -1,10 +1,14 @@
 class Awesome.Rendering.SceneRenderer extends Awesome.Object
     constructor: (@scene) ->
+        @changes = []
+
         @createElement()
         @appendToGame()
 
         @sceneEl.addEventListener 'click', (e) ->
             console.log "[#{e.offsetX}, #{e.offsetY}]" if e.button is 1
+        
+        @flush()
     
     createElement: ->
         @createWrapper()
@@ -40,15 +44,28 @@ class Awesome.Rendering.SceneRenderer extends Awesome.Object
     appendElementToWrapper: (element) ->
         @wrapper.appendChild element
     
-    follow: (entity) ->
-        entity.attrs.bind 'change', (name, value) =>
-            return unless name is 'position'
+    follow: (entity) -> 
+        @following = entity
+        entity.attrs.bind 'change', (name) =>
+            @addChange name if name is 'position'
+    
+    addChange: (name) ->
+        @changes.push name unless name in @changes
+    
+    flush: =>
+        for change in @changes
+            continue unless change is 'position'
 
-            left = @scene.game.attrs.size[0] / 2 - value[0]
-            top = @scene.game.attrs.size[1] / 2 - value[1]
+            left = @scene.game.attrs.size[0] / 2 - @following.attrs.position[0]
+            top = @scene.game.attrs.size[1] / 2 - @following.attrs.position[1]
 
             @sceneEl.style.left = "#{left}px"
             @sceneEl.style.top = "#{top}px"
+        
+        @changes = []
+
+        _.requestAnimationFrame @flush
+
     
     remove: ->
         @scene.game.renderer.removeElement @wrapper

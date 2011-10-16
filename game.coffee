@@ -4,6 +4,8 @@ class Game extends Awesome.Game
 
     @addScene Loader
     @addScene Menu
+    @addScene Manual
+    @addScene Team
     @addScene CandyLand
     @addScene Tralalalandia
     @addScene Laboratory

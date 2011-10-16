@@ -27,3 +27,4 @@ class Awesome.Entity extends Awesome.Object
         @rect ?= new Awesome.Collisions.EntityRect this
     
     remove: ->
+        @renderer.remove()

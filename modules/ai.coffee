@@ -1,4 +1,6 @@
 Awesome.module 'AI', class
+    $randomSomething: 12
+
     @init: ->
         @bind 'tick', @::tick
         @bind 'playerSpotted', @::playerSpotted
@@ -22,7 +24,7 @@ Awesome.module 'AI', class
 
         
     walkingCycleChange: ->
-        switch Math.ceil(Math.random() * 12)
+        switch Math.ceil(Math.random() * @attrs.randomSomething)
             when 1
                 @stopWalking()
                 @startWalking 'left'

@@ -2,7 +2,7 @@ Awesome.module 'Walking', class
     @init: ->
         @bind 'tick', @::tick
     
-    $speed: 8
+    $speed: 6
     $direction: 'right'
     
     startWalking: (direction) ->

@@ -2,7 +2,7 @@ Awesome.module 'Gravity', class
     @init: ->
         @bind 'tick', @::tick
     
-    gravity: 1.2
+    gravity: 0.6
     
     tick: ->
         @gravitySpeed ?= 0

@@ -35,9 +35,15 @@ class Awesome.Scene extends Awesome.Object
         entity for id, entity of @entities when entity.tagged tag
     
     remove: ->
+        @game.timer.clearEvents()
         @renderer.remove()
-
         entity.remove() for id, entity of @entities
 
-        @game.timer.clearEvents()
+    playAudio: (name) ->
+        @game.audio.pause() if @game.audio?
+
+        @game.audio = new Audio
+        @game.audio.src = "../music/#{name}"
+        @game.audio.loop = true
+        @game.audio.play()
 

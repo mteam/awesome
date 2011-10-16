@@ -13,46 +13,8 @@ class CandyLand extends Level
         $z: 0
 
         @tag 'static'
-
-        @Renderer: class FlyingLandRenderer extends Awesome.Rendering.EntityRenderer
-            createElement: ->
-                super
-
-                @el.left = document.createElement 'div'
-                @el.middle = document.createElement 'div'
-                @el.right = document.createElement 'div'
-
-                @el.appendChild @el.left
-                @el.appendChild @el.middle
-                @el.appendChild @el.right
-            
-            setupStyles: ->
-                super
-                
-                @el.left.style.float = @el.middle.style.float = @el.right.style.float = "left"
-
-            set: (name, value) ->
-                unless name is 'background'
-                    super
-                else
-                    _.extend @el.left.style, @getCssValue('background', value[0])
-                    _.extend @el.middle.style, @getCssValue('background', value[1])
-                    _.extend @el.right.style, @getCssValue('background', value[2])
-            
-            _.extend @object('css'),
-                size: (s) ->
-                    el = @renderer.el
-
-                    el.left.style.width = el.right.style.width =
-                        el.left.style.height = el.right.style.height = s[1] + "px"
-                    
-                    el.middle.style.width = s[0] - 40 + "px"
-                    el.middle.style.height = s[1] + "px"
-
-                    width: s[0] + "px"
-                    height: s[1] + "px"
         
-        rendererClass: @Renderer
+        rendererClass: FlyingLandRenderer
     
     @Tree: class Tree extends Awesome.Entity
         $background: 'candyland/obstacles/tree.png'
@@ -116,7 +78,7 @@ class CandyLand extends Level
                 right: ['candyland/monsters/momonutSR1.png', 'candyland/monsters/momonutSR2.png']
     
     @Map: class Map extends Awesome.Map
-        @add Land, position: [0, 350], size: [5000, 40]
+        @add Land, position: [0, 350], size: [5000, 50]
 
         @add FlyingLand, position: [200, 300], size: [100, 20] # steps
         @add FlyingLand, position: [320, 260], size: [100, 20] #
@@ -152,6 +114,7 @@ class CandyLand extends Level
         @add Rock, position: [3400, 300]
 
         @add FlyingLand, position: [3600, 300], size: [50, 20]
+        @add FlyingLand, position: [3670, 160], size: [50, 20]
         @add FlyingLand, position: [3670, 260], size: [50, 20]
         @add FlyingLand, position: [3740, 220], size: [50, 20]
         @add FlyingLand, position: [3810, 180], size: [500, 20]
@@ -160,10 +123,15 @@ class CandyLand extends Level
         @add FlyingLand, position: [4200, 220], size: [1000, 20]
         @add Fanmallow, position: [4500, 150], direction: 'left'
 
-        @add End, position: [4800, 120]
+        @add End, position: [4800, 130]
     
     $size: [5000, 400]
     $map: @Map
+
+    run: ->
+        super
+        
+        @playAudio 'recess_monkey-marshmallow_farm.mp3'
 
     runNextScene: ->
         @game.run 'tralalalandia', @playerClass

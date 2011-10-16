@@ -2,7 +2,7 @@ class Awesome.Entities.Button extends Awesome.Entity
     @Renderer: class ButtonRenderer extends Awesome.Rendering.EntityRenderer
         createElement: ->
             @el = document.createElement 'button'
-            window.setTimeout (=> @el.focus()), 100 # sorry
+            window.setTimeout (=> @el.focus()), 100 if @entity.attrs.focus # sorry
         
         setImage: (image) ->
             unless @image?

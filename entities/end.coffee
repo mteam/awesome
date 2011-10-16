@@ -1,6 +1,6 @@
 class End extends Awesome.Entity
-    $size: [50, 100]
-    $color: 'pink'
+    $size: [60, 90]
+    $background: 'end.png'
 
     @include 'Collisions'
 

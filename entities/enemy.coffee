@@ -3,6 +3,6 @@ class Enemy extends Awesome.Entity
     
     @tag 'visible', 'enemy'
 
-    $z: 1
+    $z: 3
     $bgRepeat: 'no'
     $direction: 'left'

@@ -1,12 +1,3 @@
-requestAnimFrame =
-    window.requestAnimationFrame       ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame    ||
-    window.oRequestAnimationFrame      ||
-    window.msRequestAnimationFrame     ||
-    (callback) ->
-        window.setTimeout callback, 1000 / 60
-
 class Awesome.Rendering.EntityRenderer extends Awesome.Object
     constructor: (@entity) ->
         @changes = []
@@ -37,15 +28,17 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
         @entity.attrs.bind 'change', @addNewChange
     
     addNewChange: (name, value) =>
-        @changes.push name
+        @changes.push name unless name in @changes
     
     flush: =>
+        return if @dead
+
         for name in @changes
             @set name, @entity.attrs[name]
         
         @changes = []
         
-        requestAnimFrame @flush
+        _.requestAnimationFrame @flush
     
     set: (name, value) =>
         return unless value?
@@ -57,6 +50,10 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
     setTitle: (pos) ->
         if pos?
             @el.title = "[#{pos[0]}, #{pos[1]}]"
+    
+    remove: ->
+        delete @el
+        @dead = true
     
     getCssValue: (name, value) ->
         @css[name]?.call @entity, value

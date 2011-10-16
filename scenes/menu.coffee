@@ -6,4 +6,10 @@ class Menu extends Awesome.Scene
     @add Awesome.Entities.Button, { text: 'Team', size: [100, 50], position: [325, 240] }
 
     run: ->
-        @getEntitiesByTag('button')[0].bind 'click', => @game.run 'playerChooser'
+        buttons = @getEntitiesByTag('button')
+        buttons[0].bind 'click', => @game.run 'playerChooser'
+        buttons[1].bind 'click', => @game.run 'manual'
+        buttons[2].bind 'click', => @game.run 'team'
+
+
+        @playAudio 'psychostick-we_ran_out_of_cd_space.mp3'

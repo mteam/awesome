@@ -3,7 +3,7 @@ Awesome.module 'Jumping', class
         @bind 'tick', @::tick
         @bind 'fall', @::stopJumping
     
-    $jump: 12
+    $jump: 8
 
     jump: ->
         @jumping = true

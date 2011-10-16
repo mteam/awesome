@@ -17,7 +17,9 @@ awesome-scripts =   awesome/underscore.coffee awesome/awesome.coffee awesome/obj
 game-scripts =      modules/ai.coffee modules/sight.coffee modules/death.coffee \
 					entities/enemy.coffee entities/end.coffee entities/attention_bar.coffee \
 					scenes/menu.coffee scenes/level.coffee scenes/fail_screen.coffee \
-					scenes/player_chooser.coffee scenes/loader.coffee \
+					scenes/player_chooser.coffee scenes/loader.coffee scenes/manual.coffee \
+					scenes/team.coffee \
+					scenes/levels/flying_land_renderer.coffee \
 					scenes/levels/candy_land.coffee scenes/levels/tralalalandia.coffee \
 					scenes/levels/laboratory.coffee \
 					entities/player.coffee entities/ninja.coffee entities/hotass.coffee \

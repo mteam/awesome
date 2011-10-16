@@ -13,9 +13,15 @@
     }
     return -1;
   }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+    return window.setTimeout(callback, 1000 / 60);
+  };
   _.mixin({
     startsWith: function(string, what) {
       return string.slice(0, what.length) === what;
+    },
+    requestAnimationFrame: function(c) {
+      return requestAnimFrame(c);
     }
   });
   this.Awesome = {
@@ -128,27 +134,30 @@
   Awesome.Collisions.EntityRect = (function() {
     __extends(EntityRect, Awesome.Collisions.Rect);
     function EntityRect(entity) {
+      var foo;
       this.entity = entity;
+      foo = this.entity.attrs;
+      this.attrs = this.entity._attrContainer.properties;
     }
     Object.defineProperties(EntityRect.prototype, {
       x: {
         get: function() {
-          return this.entity.attrs.position[0];
+          return this.attrs.position[0];
         }
       },
       y: {
         get: function() {
-          return this.entity.attrs.position[1];
+          return this.attrs.position[1];
         }
       },
       w: {
         get: function() {
-          return this.entity.attrs.size[0];
+          return this.attrs.size[0];
         }
       },
       h: {
         get: function() {
-          return this.entity.attrs.size[1];
+          return this.attrs.size[1];
         }
       }
     });
@@ -339,7 +348,7 @@
     _Class.init = function() {
       return this.bind('tick', this.prototype.tick);
     };
-    _Class.prototype.gravity = 1.2;
+    _Class.prototype.gravity = 0.6;
     _Class.prototype.tick = function() {
       var collisions, _ref;
       if ((_ref = this.gravitySpeed) == null) {
@@ -396,7 +405,7 @@
       this.bind('tick', this.prototype.tick);
       return this.bind('fall', this.prototype.stopJumping);
     };
-    _Class.prototype.$jump = 12;
+    _Class.prototype.$jump = 8;
     _Class.prototype.jump = function() {
       this.jumping = true;
       return this.trigger('jump');
@@ -439,7 +448,7 @@
     _Class.init = function() {
       return this.bind('tick', this.prototype.tick);
     };
-    _Class.prototype.$speed = 8;
+    _Class.prototype.$speed = 6;
     _Class.prototype.$direction = 'right';
     _Class.prototype.startWalking = function(direction) {
       switch (direction) {
@@ -561,9 +570,6 @@
     };
     return _Class;
   })());
-  requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
-    return window.setTimeout(callback, 1000 / 60);
-  };
   Awesome.Rendering.EntityRenderer = (function() {
     __extends(EntityRenderer, Awesome.Object);
     function EntityRenderer(entity) {
@@ -603,17 +609,22 @@
       return this.entity.attrs.bind('change', this.addNewChange);
     };
     EntityRenderer.prototype.addNewChange = function(name, value) {
-      return this.changes.push(name);
+      if (__indexOf.call(this.changes, name) < 0) {
+        return this.changes.push(name);
+      }
     };
     EntityRenderer.prototype.flush = function() {
       var name, _i, _len, _ref;
+      if (this.dead) {
+        return;
+      }
       _ref = this.changes;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         name = _ref[_i];
         this.set(name, this.entity.attrs[name]);
       }
       this.changes = [];
-      return requestAnimFrame(this.flush);
+      return _.requestAnimationFrame(this.flush);
     };
     EntityRenderer.prototype.set = function(name, value) {
       if (value == null) {
@@ -628,6 +639,10 @@
       if (pos != null) {
         return this.el.title = "[" + pos[0] + ", " + pos[1] + "]";
       }
+    };
+    EntityRenderer.prototype.remove = function() {
+      delete this.el;
+      return this.dead = true;
     };
     EntityRenderer.prototype.getCssValue = function(name, value) {
       var _ref;
@@ -682,6 +697,8 @@
     __extends(SceneRenderer, Awesome.Object);
     function SceneRenderer(scene) {
       this.scene = scene;
+      this.flush = __bind(this.flush, this);
+      this.changes = [];
       this.createElement();
       this.appendToGame();
       this.sceneEl.addEventListener('click', function(e) {
@@ -689,6 +706,7 @@
           return console.log("[" + e.offsetX + ", " + e.offsetY + "]");
         }
       });
+      this.flush();
     }
     SceneRenderer.prototype.createElement = function() {
       this.createWrapper();
@@ -725,16 +743,33 @@
       return this.wrapper.appendChild(element);
     };
     SceneRenderer.prototype.follow = function(entity) {
-      return entity.attrs.bind('change', __bind(function(name, value) {
-        var left, top;
-        if (name !== 'position') {
-          return;
+      this.following = entity;
+      return entity.attrs.bind('change', __bind(function(name) {
+        if (name === 'position') {
+          return this.addChange(name);
         }
-        left = this.scene.game.attrs.size[0] / 2 - value[0];
-        top = this.scene.game.attrs.size[1] / 2 - value[1];
-        this.sceneEl.style.left = "" + left + "px";
-        return this.sceneEl.style.top = "" + top + "px";
       }, this));
+    };
+    SceneRenderer.prototype.addChange = function(name) {
+      if (__indexOf.call(this.changes, name) < 0) {
+        return this.changes.push(name);
+      }
+    };
+    SceneRenderer.prototype.flush = function() {
+      var change, left, top, _i, _len, _ref;
+      _ref = this.changes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        change = _ref[_i];
+        if (change !== 'position') {
+          continue;
+        }
+        left = this.scene.game.attrs.size[0] / 2 - this.following.attrs.position[0];
+        top = this.scene.game.attrs.size[1] / 2 - this.following.attrs.position[1];
+        this.sceneEl.style.left = "" + left + "px";
+        this.sceneEl.style.top = "" + top + "px";
+      }
+      this.changes = [];
+      return _.requestAnimationFrame(this.flush);
     };
     SceneRenderer.prototype.remove = function() {
       return this.scene.game.renderer.removeElement(this.wrapper);
@@ -889,7 +924,9 @@
       var _ref;
       return (_ref = this.rect) != null ? _ref : this.rect = new Awesome.Collisions.EntityRect(this);
     };
-    Entity.prototype.remove = function() {};
+    Entity.prototype.remove = function() {
+      return this.renderer.remove();
+    };
     return Entity;
   })();
   Awesome.Timer = (function() {
@@ -970,14 +1007,25 @@
       return _results;
     };
     Scene.prototype.remove = function() {
-      var entity, id, _ref;
+      var entity, id, _ref, _results;
+      this.game.timer.clearEvents();
       this.renderer.remove();
       _ref = this.entities;
+      _results = [];
       for (id in _ref) {
         entity = _ref[id];
-        entity.remove();
+        _results.push(entity.remove());
       }
-      return this.game.timer.clearEvents();
+      return _results;
+    };
+    Scene.prototype.playAudio = function(name) {
+      if (this.game.audio != null) {
+        this.game.audio.pause();
+      }
+      this.game.audio = new Audio;
+      this.game.audio.src = "../music/" + name;
+      this.game.audio.loop = true;
+      return this.game.audio.play();
     };
     return Scene;
   })();
@@ -1074,9 +1122,11 @@
       }
       ButtonRenderer.prototype.createElement = function() {
         this.el = document.createElement('button');
-        return window.setTimeout((__bind(function() {
-          return this.el.focus();
-        }, this)), 100);
+        if (this.entity.attrs.focus) {
+          return window.setTimeout((__bind(function() {
+            return this.el.focus();
+          }, this)), 100);
+        }
       };
       ButtonRenderer.prototype.setImage = function(image) {
         if (this.image == null) {
