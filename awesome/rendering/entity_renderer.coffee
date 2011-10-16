@@ -1,10 +1,22 @@
+requestAnimFrame =
+    window.requestAnimationFrame       ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame    ||
+    window.oRequestAnimationFrame      ||
+    window.msRequestAnimationFrame     ||
+    (callback) ->
+        window.setTimeout callback, 1000 / 60
+
 class Awesome.Rendering.EntityRenderer extends Awesome.Object
     constructor: (@entity) ->
+        @changes = []
+
         @createElement()
         @setElementId()
         @appendToScene()
         @setupStyles()
         @bind()
+        @flush()
     
     createElement: ->
         @el = document.createElement 'div'
@@ -22,7 +34,18 @@ class Awesome.Rendering.EntityRenderer extends Awesome.Object
             @set name, value
     
     bind: ->
-        @entity.attrs.bind 'change', @set
+        @entity.attrs.bind 'change', @addNewChange
+    
+    addNewChange: (name, value) =>
+        @changes.push name
+    
+    flush: =>
+        for name in @changes
+            @set name, @entity.attrs[name]
+        
+        @changes = []
+        
+        requestAnimFrame @flush
     
     set: (name, value) =>
         return unless value?

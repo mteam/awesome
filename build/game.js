@@ -1,4 +1,4 @@
-var AttentionBar, CandyLand, End, Enemy, FailScreen, Game, Hotass, Laboratory, Level, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, Tralalalandia, game;
+var AttentionBar, CandyLand, End, Enemy, FailScreen, Game, Hotass, Laboratory, Level, Loader, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, Tralalalandia, game;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -391,6 +391,48 @@ PlayerChooser = (function() {
   };
   return PlayerChooser;
 })();
+Loader = (function() {
+  __extends(Loader, Awesome.Scene);
+  function Loader() {
+    this.imageLoaded = __bind(this.imageLoaded, this);
+    Loader.__super__.constructor.apply(this, arguments);
+  }
+  Loader.prototype.name = 'loader';
+  Loader.add(Awesome.Entities.Text, {
+    position: [350, 175],
+    size: [100, 50],
+    fontSize: 30,
+    align: 'center',
+    text: 'Loading...'
+  });
+  Loader.prototype.images = ['candyland/map/1.png', 'candyland/map/2.png', 'candyland/map/3.png', 'candyland/map/land.png', 'candyland/monsters/dadcaneL1.png', 'candyland/monsters/dadcaneL1.png', 'candyland/monsters/dadcaneL2.png', 'candyland/monsters/dadcaneR1.png', 'candyland/monsters/dadcaneR2.png', 'candyland/monsters/dadcaneSL1.png', 'candyland/monsters/dadcaneSL2.png', 'candyland/monsters/dadcaneSR1.png', 'candyland/monsters/dadcaneSR2.png', 'candyland/monsters/fanmallowL1.png', 'candyland/monsters/fanmallowL2.png', 'candyland/monsters/fanmallowR1.png', 'candyland/monsters/fanmallowR2.png', 'candyland/monsters/fanmallowSL1.png', 'candyland/monsters/fanmallowSL2.png', 'candyland/monsters/fanmallowSR1.png', 'candyland/monsters/fanmallowSR2.png', 'candyland/monsters/grankieL1.png', 'candyland/monsters/grankieL2.png', 'candyland/monsters/grankieR1.png', 'candyland/monsters/grankieR2.png', 'candyland/monsters/grankieSL1.png', 'candyland/monsters/grankieSL2.png', 'candyland/monsters/grankieSR1.png', 'candyland/monsters/grankieSR2.png', 'candyland/monsters/momonutL1.png', 'candyland/monsters/momonutL2.png', 'candyland/monsters/momonutR1.png', 'candyland/monsters/momonutR2.png', 'candyland/monsters/momonutSL1.png', 'candyland/monsters/momonutSL2.png', 'candyland/monsters/momonutSR1.png', 'candyland/monsters/momonutSR2.png', 'candyland/obstacles/grass.png', 'candyland/obstacles/stone.png', 'candyland/obstacles/tree.png'];
+  Loader.prototype.run = function() {
+    var image, img, _i, _len, _ref, _results;
+    _ref = this.images;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      image = _ref[_i];
+      img = new Image;
+      img.addEventListener('load', this.imageLoaded);
+      _results.push(img.src = "../images/" + image);
+    }
+    return _results;
+  };
+  Loader.prototype.imageLoaded = function() {
+    var _ref;
+    if ((_ref = this.counter) == null) {
+      this.counter = 0;
+    }
+    this.counter++;
+    if (this.counter === this.images.length) {
+      return this.allLoaded();
+    }
+  };
+  Loader.prototype.allLoaded = function() {
+    return this.game.run('menu');
+  };
+  return Loader;
+})();
 CandyLand = (function() {
   var Dadcane, Fanmallow, FlyingLand, Grankie, Land, Map, Momonut, Rock, TallGrass, Tree;
   __extends(CandyLand, Level);
@@ -611,6 +653,10 @@ CandyLand = (function() {
     Map.add(Rock, {
       position: [1000, 150]
     });
+    Map.add(Grankie, {
+      position: [1200, 100],
+      direction: 'right'
+    });
     Map.add(Fanmallow, {
       position: [1200, 250],
       direction: 'left'
@@ -764,6 +810,7 @@ Game = (function() {
   }
   Game.prototype.$name = 'awesome';
   Game.prototype.$size = [800, 400];
+  Game.addScene(Loader);
   Game.addScene(Menu);
   Game.addScene(CandyLand);
   Game.addScene(Tralalalandia);
@@ -773,4 +820,4 @@ Game = (function() {
   return Game;
 })();
 game = new Game;
-game.run('menu');
+game.run('loader');

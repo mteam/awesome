@@ -1,7 +1,7 @@
 class Awesome.Timer extends Awesome.Object
     @include 'Events'
 
-    constructor: (@fps = 30) ->
+    constructor: (@fps = 60) ->
     
     tick: =>
         @trigger 'tick'

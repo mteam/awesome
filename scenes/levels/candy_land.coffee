@@ -132,7 +132,7 @@ class CandyLand extends Level
         @add Momonut, position: [900, 250], direction: 'right'
 
         @add Rock, position: [1000, 150]
-        #@add Grankie, position: [1200, 100], direction: 'right'
+        @add Grankie, position: [1200, 100], direction: 'right'
 
         @add Fanmallow, position: [1200, 250], direction: 'left'
         @add Grankie, position: [1400, 250], direction: 'left'
