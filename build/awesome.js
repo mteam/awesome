@@ -1,5 +1,5 @@
 (function() {
-  var AObject, FakeArray, entityIdCounter, movementRects;
+  var AObject, FakeArray, entityIdCounter, movementRects, requestAnimFrame;
   var __slice = Array.prototype.slice, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -339,7 +339,7 @@
     _Class.init = function() {
       return this.bind('tick', this.prototype.tick);
     };
-    _Class.prototype.gravity = 0.8;
+    _Class.prototype.gravity = 1.2;
     _Class.prototype.tick = function() {
       var collisions, _ref;
       if ((_ref = this.gravitySpeed) == null) {
@@ -396,7 +396,7 @@
       this.bind('tick', this.prototype.tick);
       return this.bind('fall', this.prototype.stopJumping);
     };
-    _Class.prototype.$jump = 9;
+    _Class.prototype.$jump = 12;
     _Class.prototype.jump = function() {
       this.jumping = true;
       return this.trigger('jump');
@@ -561,16 +561,23 @@
     };
     return _Class;
   })());
+  requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+    return window.setTimeout(callback, 1000 / 60);
+  };
   Awesome.Rendering.EntityRenderer = (function() {
     __extends(EntityRenderer, Awesome.Object);
     function EntityRenderer(entity) {
       this.entity = entity;
       this.set = __bind(this.set, this);
+      this.flush = __bind(this.flush, this);
+      this.addNewChange = __bind(this.addNewChange, this);
+      this.changes = [];
       this.createElement();
       this.setElementId();
       this.appendToScene();
       this.setupStyles();
       this.bind();
+      this.flush();
     }
     EntityRenderer.prototype.createElement = function() {
       return this.el = document.createElement('div');
@@ -593,7 +600,20 @@
       return _results;
     };
     EntityRenderer.prototype.bind = function() {
-      return this.entity.attrs.bind('change', this.set);
+      return this.entity.attrs.bind('change', this.addNewChange);
+    };
+    EntityRenderer.prototype.addNewChange = function(name, value) {
+      return this.changes.push(name);
+    };
+    EntityRenderer.prototype.flush = function() {
+      var name, _i, _len, _ref;
+      _ref = this.changes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        name = _ref[_i];
+        this.set(name, this.entity.attrs[name]);
+      }
+      this.changes = [];
+      return requestAnimFrame(this.flush);
     };
     EntityRenderer.prototype.set = function(name, value) {
       if (value == null) {
@@ -876,7 +896,7 @@
     __extends(Timer, Awesome.Object);
     Timer.include('Events');
     function Timer(fps) {
-      this.fps = fps != null ? fps : 30;
+      this.fps = fps != null ? fps : 60;
       this.tick = __bind(this.tick, this);
     }
     Timer.prototype.tick = function() {

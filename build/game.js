@@ -1,4 +1,4 @@
-var AttentionBar, CandyLand, End, Enemy, FailScreen, Game, Hotass, Laboratory, Level, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, Tralalalandia, game;
+var AttentionBar, CandyLand, End, Enemy, FailScreen, Game, Hotass, Laboratory, Level, Loader, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, Tralalalandia, game;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -34,14 +34,14 @@ Awesome.module('AI', (function() {
     }
   };
   _Class.prototype.walkingCycleChange = function() {
-    switch (Math.ceil(Math.random() * 3)) {
+    switch (Math.ceil(Math.random() * 12)) {
       case 1:
         this.stopWalking();
         return this.startWalking('left');
       case 2:
         this.stopWalking();
         return this.startWalking('right');
-      case 3:
+      default:
         return this.stopWalking();
     }
   };
@@ -391,6 +391,48 @@ PlayerChooser = (function() {
   };
   return PlayerChooser;
 })();
+Loader = (function() {
+  __extends(Loader, Awesome.Scene);
+  function Loader() {
+    this.imageLoaded = __bind(this.imageLoaded, this);
+    Loader.__super__.constructor.apply(this, arguments);
+  }
+  Loader.prototype.name = 'loader';
+  Loader.add(Awesome.Entities.Text, {
+    position: [350, 175],
+    size: [100, 50],
+    fontSize: 30,
+    align: 'center',
+    text: 'Loading...'
+  });
+  Loader.prototype.images = ['candyland/map/1.png', 'candyland/map/2.png', 'candyland/map/3.png', 'candyland/map/land.png', 'candyland/monsters/dadcaneL1.png', 'candyland/monsters/dadcaneL1.png', 'candyland/monsters/dadcaneL2.png', 'candyland/monsters/dadcaneR1.png', 'candyland/monsters/dadcaneR2.png', 'candyland/monsters/dadcaneSL1.png', 'candyland/monsters/dadcaneSL2.png', 'candyland/monsters/dadcaneSR1.png', 'candyland/monsters/dadcaneSR2.png', 'candyland/monsters/fanmallowL1.png', 'candyland/monsters/fanmallowL2.png', 'candyland/monsters/fanmallowR1.png', 'candyland/monsters/fanmallowR2.png', 'candyland/monsters/fanmallowSL1.png', 'candyland/monsters/fanmallowSL2.png', 'candyland/monsters/fanmallowSR1.png', 'candyland/monsters/fanmallowSR2.png', 'candyland/monsters/grankieL1.png', 'candyland/monsters/grankieL2.png', 'candyland/monsters/grankieR1.png', 'candyland/monsters/grankieR2.png', 'candyland/monsters/grankieSL1.png', 'candyland/monsters/grankieSL2.png', 'candyland/monsters/grankieSR1.png', 'candyland/monsters/grankieSR2.png', 'candyland/monsters/momonutL1.png', 'candyland/monsters/momonutL2.png', 'candyland/monsters/momonutR1.png', 'candyland/monsters/momonutR2.png', 'candyland/monsters/momonutSL1.png', 'candyland/monsters/momonutSL2.png', 'candyland/monsters/momonutSR1.png', 'candyland/monsters/momonutSR2.png', 'candyland/obstacles/grass.png', 'candyland/obstacles/stone.png', 'candyland/obstacles/tree.png'];
+  Loader.prototype.run = function() {
+    var image, img, _i, _len, _ref, _results;
+    _ref = this.images;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      image = _ref[_i];
+      img = new Image;
+      img.addEventListener('load', this.imageLoaded);
+      _results.push(img.src = "../images/" + image);
+    }
+    return _results;
+  };
+  Loader.prototype.imageLoaded = function() {
+    var _ref;
+    if ((_ref = this.counter) == null) {
+      this.counter = 0;
+    }
+    this.counter++;
+    if (this.counter === this.images.length) {
+      return this.allLoaded();
+    }
+  };
+  Loader.prototype.allLoaded = function() {
+    return this.game.run('menu');
+  };
+  return Loader;
+})();
 CandyLand = (function() {
   var Dadcane, Fanmallow, FlyingLand, Grankie, Land, Map, Momonut, Rock, TallGrass, Tree;
   __extends(CandyLand, Level);
@@ -573,45 +615,120 @@ CandyLand = (function() {
     function Map() {
       Map.__super__.constructor.apply(this, arguments);
     }
-    Map.add(CandyLand.Land, {
+    Map.add(Land, {
       position: [0, 350],
       size: [5000, 40]
     });
-    Map.add(CandyLand.FlyingLand, {
+    Map.add(FlyingLand, {
       position: [200, 300],
       size: [100, 20]
     });
-    Map.add(CandyLand.FlyingLand, {
-      position: [320, 250],
+    Map.add(FlyingLand, {
+      position: [320, 260],
       size: [100, 20]
     });
-    Map.add(CandyLand.FlyingLand, {
+    Map.add(FlyingLand, {
       position: [440, 200],
       size: [1500, 20]
     });
-    Map.add(CandyLand.Tree, {
-      position: [600, 260]
+    Map.add(Tree, {
+      position: [500, 260]
     });
-    Map.add(CandyLand.TallGrass, {
-      position: [1200, 300]
+    Map.add(FlyingLand, {
+      position: [800, 150],
+      size: [100, 20]
     });
-    Map.add(CandyLand.Rock, {
-      position: [1000, 300]
+    Map.add(FlyingLand, {
+      position: [650, 100],
+      size: [100, 20]
     });
     Map.add(Dadcane, {
-      position: [1300, 250],
+      position: [800, 250],
       direction: 'left'
     });
+    Map.add(Momonut, {
+      position: [900, 250],
+      direction: 'right'
+    });
+    Map.add(Rock, {
+      position: [1000, 150]
+    });
+    Map.add(Grankie, {
+      position: [1200, 100],
+      direction: 'right'
+    });
     Map.add(Fanmallow, {
-      position: [1400, 250],
+      position: [1200, 250],
       direction: 'left'
     });
     Map.add(Grankie, {
-      position: [1500, 250],
+      position: [1400, 250],
+      direction: 'left'
+    });
+    Map.add(TallGrass, {
+      position: [1500, 150]
+    });
+    Map.add(Tree, {
+      position: [1750, 110]
+    });
+    Map.add(FlyingLand, {
+      position: [2200, 280],
+      size: [280, 20]
+    });
+    Map.add(Tree, {
+      position: [2300, 190]
+    });
+    Map.add(FlyingLand, {
+      position: [2600, 200],
+      size: [600, 20]
+    });
+    Map.add(Dadcane, {
+      position: [2800, 100],
+      direction: 'right'
+    });
+    Map.add(Momonut, {
+      position: [2940, 120],
+      direction: 'left'
+    });
+    Map.add(TallGrass, {
+      position: [2800, 300]
+    });
+    Map.add(TallGrass, {
+      position: [2950, 300]
+    });
+    Map.add(Rock, {
+      position: [3400, 300]
+    });
+    Map.add(FlyingLand, {
+      position: [3600, 300],
+      size: [50, 20]
+    });
+    Map.add(FlyingLand, {
+      position: [3670, 260],
+      size: [50, 20]
+    });
+    Map.add(FlyingLand, {
+      position: [3740, 220],
+      size: [50, 20]
+    });
+    Map.add(FlyingLand, {
+      position: [3810, 180],
+      size: [500, 20]
+    });
+    Map.add(Fanmallow, {
+      position: [4000, 100],
+      direction: 'left'
+    });
+    Map.add(FlyingLand, {
+      position: [4200, 220],
+      size: [1000, 20]
+    });
+    Map.add(Fanmallow, {
+      position: [4500, 150],
       direction: 'left'
     });
     Map.add(End, {
-      position: [4500, 250]
+      position: [4800, 120]
     });
     return Map;
   })();
@@ -693,6 +810,7 @@ Game = (function() {
   }
   Game.prototype.$name = 'awesome';
   Game.prototype.$size = [800, 400];
+  Game.addScene(Loader);
   Game.addScene(Menu);
   Game.addScene(CandyLand);
   Game.addScene(Tralalalandia);
@@ -702,4 +820,4 @@ Game = (function() {
   return Game;
 })();
 game = new Game;
-game.run('menu');
+game.run('loader');
