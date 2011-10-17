@@ -10,4 +10,5 @@ class Game extends Awesome.Game
     @addScene Tralalalandia
     @addScene Laboratory
     @addScene FailScreen
+    @addScene WinScreen
     @addScene PlayerChooser

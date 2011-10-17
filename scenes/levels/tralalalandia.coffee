@@ -124,7 +124,7 @@ class Tralalalandia extends Level
     run: ->
         super
 
-        @playAudio 'bobby_mcferin-dont_worry_be_happy.mp3'
+        @playAudio 'bobby_mcferrin-dont_worry_be_happy.mp3'
 
     runNextScene: ->
         @game.run 'laboratory', @playerClass

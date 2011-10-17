@@ -430,7 +430,8 @@
       if (!this.crouching) {
         this.crouching = true;
         move = this.attrs.size[1] /= 2;
-        return this.attrs.position[1] += move;
+        this.attrs.position[1] += move;
+        return this.trigger('crouch');
       }
     };
     _Class.prototype.standUp = function() {
@@ -438,7 +439,8 @@
       if (this.crouching) {
         this.crouching = false;
         move = this.attrs.size[1] *= 2;
-        return this.attrs.position[1] -= move / 2;
+        this.attrs.position[1] -= move / 2;
+        return this.trigger('standUp');
       }
     };
     return _Class;
@@ -513,7 +515,9 @@
       this.bind('startWalking', this.prototype.startWalkingAnimation);
       this.bind('stopWalking', this.prototype.stopWalkingAnimation);
       this.bind('playerSpotted', this.prototype.setSpottedWalkingAnimation);
-      return this.bind('playerGone', this.prototype.setNormalWalkingAnimation);
+      this.bind('playerGone', this.prototype.setNormalWalkingAnimation);
+      this.bind('crouch', this.prototype.setCrouchingAnimation);
+      return this.bind('standUp', this.prototype.setNormalWalkingAnimation);
     };
     function _Class() {
       this.setNormalWalkingAnimation();
@@ -526,7 +530,10 @@
       if (direction == null) {
         direction = this.attrs.direction;
       }
-      return this.attrs.set('background', this.walkingAnimations[direction][1]);
+      if (this.crouching) {
+        return;
+      }
+      return this.attrs.set('background', this.attrs.walkingAnimation.standing || this.walkingAnimations[direction][1]);
     };
     _Class.prototype.stopWalkingAnimation = function() {
       return this.resetAnimation();
@@ -538,9 +545,12 @@
       this.walkingAnimations = this.attrs.walkingAnimation.normal;
       return this.resetAnimation();
     };
+    _Class.prototype.setCrouchingAnimation = function() {
+      return this.attrs.background = this.attrs.walkingAnimation.crouching;
+    };
     _Class.prototype.tick = function() {
       var index;
-      if (this.walking) {
+      if (this.walking && !this.crouching) {
         index = this.getAnimationIndex();
         return this.attrs.background = this.walkingAnimations[this.attrs.direction][index];
       }
@@ -718,7 +728,8 @@
       return _.extend(this.wrapper.style, {
         width: "100%",
         height: "100%",
-        position: "relative"
+        position: "relative",
+        backgroundColor: this.scene.attrs.color || 'white'
       });
     };
     SceneRenderer.prototype.createScene = function() {
@@ -1019,13 +1030,17 @@
       return _results;
     };
     Scene.prototype.playAudio = function(name) {
+      if (name === this.game.playingAudioName) {
+        return;
+      }
       if (this.game.audio != null) {
         this.game.audio.pause();
       }
       this.game.audio = new Audio;
       this.game.audio.src = "../music/" + name;
       this.game.audio.loop = true;
-      return this.game.audio.play();
+      this.game.audio.play();
+      return this.game.playingAudioName = name;
     };
     return Scene;
   })();
@@ -1106,6 +1121,7 @@
       });
       return TextRenderer;
     })();
+    Text.tag('text');
     Text.prototype.rendererClass = Text.Renderer;
     return Text;
   }).call(this);

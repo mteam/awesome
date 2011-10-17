@@ -18,11 +18,11 @@ game-scripts =      modules/ai.coffee modules/sight.coffee modules/death.coffee 
 					entities/enemy.coffee entities/end.coffee entities/attention_bar.coffee \
 					scenes/menu.coffee scenes/level.coffee scenes/fail_screen.coffee \
 					scenes/player_chooser.coffee scenes/loader.coffee scenes/manual.coffee \
-					scenes/team.coffee \
+					scenes/team.coffee scenes/win_screen.coffee \
 					scenes/levels/flying_land_renderer.coffee \
 					scenes/levels/candy_land.coffee scenes/levels/tralalalandia.coffee \
 					scenes/levels/laboratory.coffee \
-					entities/player.coffee entities/ninja.coffee entities/hotass.coffee \
+					entities/player.coffee entities/geek.coffee entities/hotass.coffee \
 					entities/pirate.coffee \
 					game.coffee bootstrap.coffee
 

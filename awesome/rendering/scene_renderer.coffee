@@ -22,6 +22,7 @@ class Awesome.Rendering.SceneRenderer extends Awesome.Object
             width: "100%"
             height: "100%"
             position: "relative"
+            backgroundColor: @scene.attrs.color || 'white'
     
     createScene: ->
         @sceneEl = document.createElement 'div'

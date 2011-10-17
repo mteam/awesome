@@ -79,7 +79,7 @@ class Laboratory extends Level
         @add Creeper, position: [700, 250], direction: 'left'
 
         @add FlyingLand, position: [400, 300], size: [100, 20]
-        @add FlyingLand, position: [500, 250], size: [100, 20]
+        @add FlyingLand, position: [500, 240], size: [100, 20]
         @add FlyingLand, position: [600, 200], size: [400, 20]
 
         @add Pacman, position: [900, 140], direction: 'left', randomSomething: 36
@@ -120,6 +120,7 @@ class Laboratory extends Level
         @add End, position: [4500, 260]
     
     $size: [5000, 400]
+    $color: '#A6A6A6'
     $map: @Map
 
     run: ->

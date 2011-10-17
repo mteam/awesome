@@ -40,10 +40,14 @@ class Awesome.Scene extends Awesome.Object
         entity.remove() for id, entity of @entities
 
     playAudio: (name) ->
+        return if name is @game.playingAudioName
+
         @game.audio.pause() if @game.audio?
 
         @game.audio = new Audio
         @game.audio.src = "../music/#{name}"
         @game.audio.loop = true
         @game.audio.play()
+
+        @game.playingAudioName = name
 

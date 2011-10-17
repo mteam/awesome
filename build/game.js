@@ -1,4 +1,4 @@
-var AttentionBar, CandyLand, End, Enemy, FailScreen, FlyingLandRenderer, Game, Hotass, Laboratory, Level, Loader, Manual, Menu, Ninja, Pirate, Player, PlayerChooser, SightRect, Team, Tralalalandia, game;
+var AttentionBar, CandyLand, End, Enemy, FailScreen, FlyingLandRenderer, Game, Geek, Hotass, Laboratory, Level, Loader, Manual, Menu, Pirate, Player, PlayerChooser, SightRect, Team, Tralalalandia, WinScreen, game;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -371,12 +371,12 @@ PlayerChooser = (function() {
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [250, 180],
-    image: 'characters/hotass/standing.png'
+    image: 'characters/hotass/standing.png?'
   });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [350, 180],
-    image: 'characters/ninja/standing.png'
+    image: 'characters/geek/standing.png'
   });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
@@ -384,6 +384,7 @@ PlayerChooser = (function() {
     image: 'characters/pirate/standing.png'
   });
   PlayerChooser.prototype.runLevel = function(player) {
+    this.game.startTime = new Date;
     return this.game.run('candyLand', player);
   };
   PlayerChooser.prototype.run = function() {
@@ -393,7 +394,7 @@ PlayerChooser = (function() {
       return this.runLevel(Hotass);
     }, this));
     buttons[1].bind('click', __bind(function() {
-      return this.runLevel(Ninja);
+      return this.runLevel(Geek);
     }, this));
     return buttons[2].bind('click', __bind(function() {
       return this.runLevel(Pirate);
@@ -492,6 +493,40 @@ Team = (function() {
     }, this));
   };
   return Team;
+})();
+WinScreen = (function() {
+  __extends(WinScreen, Awesome.Scene);
+  function WinScreen() {
+    WinScreen.__super__.constructor.apply(this, arguments);
+  }
+  WinScreen.prototype.name = 'winScreen';
+  WinScreen.add(Awesome.Entities.Text, {
+    position: [350, 100],
+    size: [100, 50],
+    align: 'center',
+    fontSize: 30,
+    text: "Win"
+  });
+  WinScreen.add(Awesome.Entities.Text, {
+    position: [200, 200],
+    size: [400, 50],
+    align: 'center',
+    fontSize: 25,
+    text: "You've destroyed the world in "
+  });
+  WinScreen.prototype.run = function() {
+    var diff, minutes, seconds, texts;
+    texts = this.getEntitiesByTag('text');
+    diff = (new Date).getTime() - this.game.startTime.getTime();
+    diff /= 1000;
+    diff = Math.floor(diff);
+    minutes = Math.floor(diff / 60);
+    seconds = diff - minutes * 60;
+    seconds = seconds < 10 ? "0" + seconds : "" + seconds;
+    texts[1].attrs.text += "" + minutes + ":" + seconds;
+    return this.playAudio('rem-end_of_the_world.mp3');
+  };
+  return WinScreen;
 })();
 FlyingLandRenderer = (function() {
   __extends(FlyingLandRenderer, Awesome.Rendering.EntityRenderer);
@@ -1064,7 +1099,7 @@ Tralalalandia = (function() {
   Tralalalandia.prototype.$map = Tralalalandia.Map;
   Tralalalandia.prototype.run = function() {
     Tralalalandia.__super__.run.apply(this, arguments);
-    return this.playAudio('bobby_mcferin-dont_worry_be_happy.mp3');
+    return this.playAudio('bobby_mcferrin-dont_worry_be_happy.mp3');
   };
   Tralalalandia.prototype.runNextScene = function() {
     return this.game.run('laboratory', this.playerClass);
@@ -1218,7 +1253,7 @@ Laboratory = (function() {
       size: [100, 20]
     });
     Map.add(FlyingLand, {
-      position: [500, 250],
+      position: [500, 240],
       size: [100, 20]
     });
     Map.add(FlyingLand, {
@@ -1332,6 +1367,7 @@ Laboratory = (function() {
     return Map;
   })();
   Laboratory.prototype.$size = [5000, 400];
+  Laboratory.prototype.$color = '#A6A6A6';
   Laboratory.prototype.$map = Laboratory.Map;
   Laboratory.prototype.run = function() {
     Laboratory.__super__.run.apply(this, arguments);
@@ -1345,9 +1381,10 @@ Laboratory = (function() {
 }).call(this);
 Player = (function() {
   __extends(Player, Awesome.Entity);
-  Player.include('Collisions', 'Gravity', 'Walking', 'Jumping', 'Death', 'Crouching', 'Controls');
+  Player.include('Collisions', 'Gravity', 'Walking', 'Jumping', 'Death', 'Crouching', 'Controls', 'WalkingAnimation');
   Player.tag('visible', 'player');
   Player.prototype.$z = 1;
+  Player.prototype.$walkAnimationSpeed = 3;
   function Player() {
     Player.__super__.constructor.apply(this, arguments);
   }
@@ -1356,24 +1393,36 @@ Player = (function() {
   };
   return Player;
 })();
-Ninja = (function() {
-  __extends(Ninja, Player);
-  function Ninja() {
-    Ninja.__super__.constructor.apply(this, arguments);
+Geek = (function() {
+  __extends(Geek, Player);
+  function Geek() {
+    Geek.__super__.constructor.apply(this, arguments);
   }
-  Ninja.prototype.$size = [40, 80];
-  Ninja.prototype.$color = 'black';
-  Ninja.prototype.$jump = 13;
-  Ninja.prototype.$speed = 12;
-  return Ninja;
+  Geek.prototype.$size = [60, 100];
+  Geek.prototype.$walkingAnimation = {
+    standing: 'characters/geek/standing.png',
+    crouching: 'characters/geek/crouching.png?',
+    normal: {
+      left: ['characters/geek/walkingL1.png', 'characters/geek/walkingL2.png'],
+      right: ['characters/geek/walkingR1.png', 'characters/geek/walkingR2.png']
+    }
+  };
+  return Geek;
 })();
 Hotass = (function() {
   __extends(Hotass, Player);
   function Hotass() {
     Hotass.__super__.constructor.apply(this, arguments);
   }
-  Hotass.prototype.$size = [40, 80];
-  Hotass.prototype.$color = 'blue';
+  Hotass.prototype.$size = [60, 100];
+  Hotass.prototype.$walkingAnimation = {
+    standing: 'characters/hotass/standing.png?',
+    crouching: 'characters/hotass/crouching.png?',
+    normal: {
+      left: ['characters/hotass/walkingL1.png', 'characters/hotass/walkingL2.png'],
+      right: ['characters/hotass/walkingR1.png', 'characters/hotass/walkingR2.png']
+    }
+  };
   return Hotass;
 })();
 Pirate = (function() {
@@ -1381,8 +1430,15 @@ Pirate = (function() {
   function Pirate() {
     Pirate.__super__.constructor.apply(this, arguments);
   }
-  Pirate.prototype.$size = [40, 80];
-  Pirate.prototype.$color = 'brown';
+  Pirate.prototype.$size = [60, 100];
+  Pirate.prototype.$walkingAnimation = {
+    standing: 'characters/pirate/standing.png',
+    crouching: 'characters/pirate/crouching.png?',
+    normal: {
+      left: ['characters/pirate/walkingL1.png', 'characters/pirate/walkingL2.png'],
+      right: ['characters/pirate/walkingR1.png', 'characters/pirate/walkingR2.png']
+    }
+  };
   return Pirate;
 })();
 Game = (function() {
@@ -1400,6 +1456,7 @@ Game = (function() {
   Game.addScene(Tralalalandia);
   Game.addScene(Laboratory);
   Game.addScene(FailScreen);
+  Game.addScene(WinScreen);
   Game.addScene(PlayerChooser);
   return Game;
 })();

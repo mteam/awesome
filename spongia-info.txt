@@ -1,0 +1,9 @@
+Názov tímu: Marshmallows
+Názov hry: Awesome
+Vývojové prostredie a prostriedky: CoffeeScript
+
+Obrázky:
+všetky z vlastnej tvorby
+
+Hudba:
+všetko odniekiaľ z netu

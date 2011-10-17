@@ -5,6 +5,8 @@ Awesome.module 'WalkingAnimation', class
         @bind 'stopWalking', @::stopWalkingAnimation
         @bind 'playerSpotted', @::setSpottedWalkingAnimation
         @bind 'playerGone', @::setNormalWalkingAnimation
+        @bind 'crouch', @::setCrouchingAnimation
+        @bind 'standUp', @::setNormalWalkingAnimation
     
     constructor: ->
         @setNormalWalkingAnimation()
@@ -14,7 +16,8 @@ Awesome.module 'WalkingAnimation', class
         @resetAnimation direction
     
     resetAnimation: (direction = @attrs.direction) ->
-        @attrs.set 'background', @walkingAnimations[direction][1]            
+        return if @crouching
+        @attrs.set 'background', @attrs.walkingAnimation.standing || @walkingAnimations[direction][1]            
     
     stopWalkingAnimation: ->
         @resetAnimation()
@@ -26,8 +29,11 @@ Awesome.module 'WalkingAnimation', class
         @walkingAnimations = @attrs.walkingAnimation.normal
         @resetAnimation()
     
+    setCrouchingAnimation: ->
+        @attrs.background = @attrs.walkingAnimation.crouching
+    
     tick: ->
-        if @walking
+        if @walking and not @crouching
             index = @getAnimationIndex()
             @attrs.background = @walkingAnimations[@attrs.direction][index]
 

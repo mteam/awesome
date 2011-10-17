@@ -11,5 +11,7 @@ class Awesome.Entities.Text extends Awesome.Entity
                 fontSize: s + "px"
             align: (a) ->
                 textAlign: a
+    
+    @tag 'text'
 
     rendererClass: @Renderer
