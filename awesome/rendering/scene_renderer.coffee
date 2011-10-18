@@ -18,11 +18,16 @@ class Awesome.Rendering.SceneRenderer extends Awesome.Object
         @wrapper = document.createElement 'div'
         @wrapper.id = "scene_#{@scene.name}"
 
+        if @scene.attrs.background
+            bg = "url(../images/backgrounds/" + @scene.attrs.background + ")"
+        else
+            bg = "none"
+
         _.extend @wrapper.style,
             width: "100%"
             height: "100%"
             position: "relative"
-            backgroundColor: @scene.attrs.color || 'white'
+            backgroundImage: bg
     
     createScene: ->
         @sceneEl = document.createElement 'div'

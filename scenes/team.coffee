@@ -1,10 +1,13 @@
 class Team extends Awesome.Scene
     name: 'team'
 
-    @add Awesome.Entities.Button, position: [350, 30], size: [100, 50], text: 'Back'
-    @add Awesome.Entities.Text, { position: [100, 100], size: [600, 1000], text: """
-        Awesome!
+    @add Awesome.Entities.ImgButton, position: [350, 30], size: [150, 50], image: 'backtomenu.png'
+    @add Awesome.Entities.Text, { position: [200, 200], size: [400, 1000], text: """
+        Programming: Michal Miškerník<br>
+        Graphics: Anna-Mária Klimkovič
     """ }
+
+    $background: 'menu.png'
 
     run: ->
         buttons = @getEntitiesByTag('button')

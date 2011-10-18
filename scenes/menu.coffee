@@ -1,9 +1,11 @@
 class Menu extends Awesome.Scene
     name: 'menu'
 
-    @add Awesome.Entities.Button, text: 'Start', size: [100, 50], position: [325, 100]
-    @add Awesome.Entities.Button, text: 'Manual', size: [100, 50], position: [325, 170]
-    @add Awesome.Entities.Button, { text: 'Team', size: [100, 50], position: [325, 240] }
+    @add Awesome.Entities.ImgButton, size: [150, 50], position: [325, 150], image: 'start.png'
+    @add Awesome.Entities.ImgButton, size: [150, 50], position: [325, 220], image: 'manual.png'
+    @add Awesome.Entities.ImgButton, { size: [150, 50], position: [325, 290], image: 'team.png' }
+
+    $background: 'menu.png'
 
     run: ->
         buttons = @getEntitiesByTag('button')

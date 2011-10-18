@@ -269,21 +269,22 @@ Menu = (function() {
     Menu.__super__.constructor.apply(this, arguments);
   }
   Menu.prototype.name = 'menu';
-  Menu.add(Awesome.Entities.Button, {
-    text: 'Start',
-    size: [100, 50],
-    position: [325, 100]
+  Menu.add(Awesome.Entities.ImgButton, {
+    size: [150, 50],
+    position: [325, 150],
+    image: 'start.png'
   });
-  Menu.add(Awesome.Entities.Button, {
-    text: 'Manual',
-    size: [100, 50],
-    position: [325, 170]
+  Menu.add(Awesome.Entities.ImgButton, {
+    size: [150, 50],
+    position: [325, 220],
+    image: 'manual.png'
   });
-  Menu.add(Awesome.Entities.Button, {
-    text: 'Team',
-    size: [100, 50],
-    position: [325, 240]
+  Menu.add(Awesome.Entities.ImgButton, {
+    size: [150, 50],
+    position: [325, 290],
+    image: 'team.png'
   });
+  Menu.prototype.$background = 'menu.png';
   Menu.prototype.run = function() {
     var buttons;
     buttons = this.getEntitiesByTag('button');
@@ -326,21 +327,22 @@ FailScreen = (function() {
   FailScreen.prototype.name = 'failScreen';
   FailScreen.add(Awesome.Entities.Text, {
     text: 'Fail',
-    position: [325, 175],
+    position: [325, 100],
     size: [150, 50],
     fontSize: 30,
     align: 'center'
   });
-  FailScreen.add(Awesome.Entities.Button, {
-    text: 'Restart level',
-    position: [325, 250],
+  FailScreen.add(Awesome.Entities.ImgButton, {
+    image: 'restartlevel.png',
+    position: [325, 150],
     size: [150, 50]
   });
-  FailScreen.add(Awesome.Entities.Button, {
-    text: 'Back to menu',
-    position: [325, 320],
+  FailScreen.add(Awesome.Entities.ImgButton, {
+    image: 'backtomenu.png',
+    position: [325, 220],
     size: [150, 50]
   });
+  FailScreen.prototype.$background = 'fail.png';
   FailScreen.prototype.run = function(fromScene, player) {
     var buttons;
     this.fromScene = fromScene;
@@ -361,13 +363,6 @@ PlayerChooser = (function() {
     PlayerChooser.__super__.constructor.apply(this, arguments);
   }
   PlayerChooser.prototype.name = 'playerChooser';
-  PlayerChooser.add(Awesome.Entities.Text, {
-    size: [200, 50],
-    position: [300, 100],
-    text: 'Choose your villian',
-    align: 'center',
-    fontSize: 25
-  });
   PlayerChooser.add(Awesome.Entities.Button, {
     size: [80, 120],
     position: [250, 180],
@@ -383,6 +378,7 @@ PlayerChooser = (function() {
     position: [450, 180],
     image: 'characters/pirate/standing.png'
   });
+  PlayerChooser.prototype.$background = 'menu.png';
   PlayerChooser.prototype.runLevel = function(player) {
     this.game.startTime = new Date;
     return this.game.run('candyLand', player);
@@ -450,16 +446,17 @@ Manual = (function() {
     Manual.__super__.constructor.apply(this, arguments);
   }
   Manual.prototype.name = 'manual';
-  Manual.add(Awesome.Entities.Button, {
+  Manual.add(Awesome.Entities.ImgButton, {
     position: [350, 30],
-    size: [100, 50],
-    text: 'Back'
+    size: [150, 50],
+    image: 'backtomenu.png'
   });
   Manual.add(Awesome.Entities.Text, {
-    position: [100, 100],
-    size: [600, 1000],
-    text: "Awesome!"
+    position: [200, 150],
+    size: [400, 1000],
+    text: "<p>\n    You want to destroy the world, because your parents, Mr. Cane and Mrs. Donut, told you that\n    you are adopted.\n</p>\n<p>\n    There are three levels - Candy Land, Tralalalandia and Laboratory. In each there are 4 types of\n    monsters that want to kill you.\n</p>\n<p>\n    When they notice you, they will run after you. However, you can hide behind things by crouching\n    (down arrow) or run from them.\n</p>\n<p>\n    Good luck.\n</p>"
   });
+  Manual.prototype.$background = 'menu.png';
   Manual.prototype.run = function() {
     var buttons;
     buttons = this.getEntitiesByTag('button');
@@ -475,16 +472,17 @@ Team = (function() {
     Team.__super__.constructor.apply(this, arguments);
   }
   Team.prototype.name = 'team';
-  Team.add(Awesome.Entities.Button, {
+  Team.add(Awesome.Entities.ImgButton, {
     position: [350, 30],
-    size: [100, 50],
-    text: 'Back'
+    size: [150, 50],
+    image: 'backtomenu.png'
   });
   Team.add(Awesome.Entities.Text, {
-    position: [100, 100],
-    size: [600, 1000],
-    text: "Awesome!"
+    position: [200, 200],
+    size: [400, 1000],
+    text: "Programming: Michal Miškerník<br>\nGraphics: Anna-Mária Klimkovič"
   });
+  Team.prototype.$background = 'menu.png';
   Team.prototype.run = function() {
     var buttons;
     buttons = this.getEntitiesByTag('button');
@@ -501,19 +499,20 @@ WinScreen = (function() {
   }
   WinScreen.prototype.name = 'winScreen';
   WinScreen.add(Awesome.Entities.Text, {
-    position: [350, 100],
+    position: [350, 200],
     size: [100, 50],
     align: 'center',
     fontSize: 30,
     text: "Win"
   });
   WinScreen.add(Awesome.Entities.Text, {
-    position: [200, 200],
+    position: [200, 300],
     size: [400, 50],
     align: 'center',
     fontSize: 25,
     text: "You've destroyed the world in "
   });
+  WinScreen.prototype.$background = 'menu.png';
   WinScreen.prototype.run = function() {
     var diff, minutes, seconds, texts;
     texts = this.getEntitiesByTag('text');
@@ -832,6 +831,7 @@ CandyLand = (function() {
   })();
   CandyLand.prototype.$size = [5000, 400];
   CandyLand.prototype.$map = CandyLand.Map;
+  CandyLand.prototype.$background = 'candy_land.png';
   CandyLand.prototype.run = function() {
     CandyLand.__super__.run.apply(this, arguments);
     return this.playAudio('recess_monkey-marshmallow_farm.mp3');
@@ -1097,6 +1097,7 @@ Tralalalandia = (function() {
   })();
   Tralalalandia.prototype.$size = [5000, 400];
   Tralalalandia.prototype.$map = Tralalalandia.Map;
+  Tralalalandia.prototype.$background = 'tralalalandia.png';
   Tralalalandia.prototype.run = function() {
     Tralalalandia.__super__.run.apply(this, arguments);
     return this.playAudio('bobby_mcferrin-dont_worry_be_happy.mp3');
@@ -1367,7 +1368,7 @@ Laboratory = (function() {
     return Map;
   })();
   Laboratory.prototype.$size = [5000, 400];
-  Laboratory.prototype.$color = '#A6A6A6';
+  Laboratory.prototype.$background = 'laboratory.png';
   Laboratory.prototype.$map = Laboratory.Map;
   Laboratory.prototype.run = function() {
     Laboratory.__super__.run.apply(this, arguments);

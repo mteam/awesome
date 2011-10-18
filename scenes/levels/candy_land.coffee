@@ -127,6 +127,7 @@ class CandyLand extends Level
     
     $size: [5000, 400]
     $map: @Map
+    $background: 'candy_land.png'
 
     run: ->
         super

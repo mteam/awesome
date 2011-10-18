@@ -2,18 +2,21 @@ class WinScreen extends Awesome.Scene
     name: 'winScreen'
 
     @add Awesome.Entities.Text,
-        position: [350, 100],
+        position: [350, 200],
         size: [100, 50],
         align: 'center',
         fontSize: 30,
         text: "Win"
     
     @add Awesome.Entities.Text,
-        position: [200, 200],
+        position: [200, 300],
         size: [400, 50],
         align: 'center',
         fontSize: 25,
         text: "You've destroyed the world in "
+
+
+    $background: 'menu.png'
     
     run: ->
         texts = @getEntitiesByTag 'text'

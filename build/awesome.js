@@ -485,27 +485,36 @@
       this.keyUp = __bind(this.keyUp, this);
       this.keyDown = __bind(this.keyDown, this);      window.addEventListener('keydown', this.keyDown, false);
       window.addEventListener('keyup', this.keyUp, false);
+      this.pressed = {};
     }
     _Class.prototype.keyDown = function(e) {
-      switch (e.keyCode) {
-        case 37:
-          return this.startWalking('left');
-        case 39:
-          return this.startWalking('right');
-        case 38:
-          return this.jump();
-        case 40:
-          return this.crouch();
+      if (!this.pressed[e.keyCode]) {
+        switch (e.keyCode) {
+          case 37:
+            this.startWalking('left');
+            break;
+          case 39:
+            this.startWalking('right');
+            break;
+          case 38:
+            this.jump();
+            break;
+          case 40:
+            this.crouch();
+        }
+        return this.pressed[e.keyCode] = true;
       }
     };
     _Class.prototype.keyUp = function(e) {
       switch (e.keyCode) {
         case 37:
         case 39:
-          return this.stopWalking();
+          this.stopWalking();
+          break;
         case 40:
-          return this.standUp();
+          this.standUp();
       }
+      return this.pressed[e.keyCode] = false;
     };
     return _Class;
   })());
@@ -723,13 +732,19 @@
       return this.createScene();
     };
     SceneRenderer.prototype.createWrapper = function() {
+      var bg;
       this.wrapper = document.createElement('div');
       this.wrapper.id = "scene_" + this.scene.name;
+      if (this.scene.attrs.background) {
+        bg = "url(../images/backgrounds/" + this.scene.attrs.background + ")";
+      } else {
+        bg = "none";
+      }
       return _.extend(this.wrapper.style, {
         width: "100%",
         height: "100%",
         position: "relative",
-        backgroundColor: this.scene.attrs.color || 'white'
+        backgroundImage: bg
       });
     };
     SceneRenderer.prototype.createScene = function() {
@@ -1137,12 +1152,7 @@
         ButtonRenderer.__super__.constructor.apply(this, arguments);
       }
       ButtonRenderer.prototype.createElement = function() {
-        this.el = document.createElement('button');
-        if (this.entity.attrs.focus) {
-          return window.setTimeout((__bind(function() {
-            return this.el.focus();
-          }, this)), 100);
-        }
+        return this.el = document.createElement('button');
       };
       ButtonRenderer.prototype.setImage = function(image) {
         if (this.image == null) {
@@ -1174,5 +1184,41 @@
       return this.renderer;
     };
     return Button;
+  })();
+  Awesome.Entities.ImgButton = (function() {
+    var ButtonRenderer;
+    __extends(ImgButton, Awesome.Entity);
+    function ImgButton() {
+      ImgButton.__super__.constructor.apply(this, arguments);
+    }
+    ImgButton.Renderer = ButtonRenderer = (function() {
+      __extends(ButtonRenderer, Awesome.Rendering.EntityRenderer);
+      function ButtonRenderer() {
+        ButtonRenderer.__super__.constructor.apply(this, arguments);
+      }
+      ButtonRenderer.prototype.createElement = function() {
+        return this.el = document.createElement('img');
+      };
+      ButtonRenderer.prototype.set = function(name, value) {
+        switch (name) {
+          case 'image':
+            return this.el.src = "../images/buttons/" + value;
+          default:
+            return ButtonRenderer.__super__.set.apply(this, arguments);
+        }
+      };
+      return ButtonRenderer;
+    })();
+    ImgButton.include('Events');
+    ImgButton.tag('button');
+    ImgButton.prototype.rendererClass = ImgButton.Renderer;
+    ImgButton.prototype.setupRenderer = function() {
+      ImgButton.__super__.setupRenderer.apply(this, arguments);
+      this.renderer.el.addEventListener('click', __bind(function() {
+        return this.trigger('click');
+      }, this));
+      return this.renderer;
+    };
+    return ImgButton;
   })();
 }).call(this);

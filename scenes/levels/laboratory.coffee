@@ -120,7 +120,7 @@ class Laboratory extends Level
         @add End, position: [4500, 260]
     
     $size: [5000, 400]
-    $color: '#A6A6A6'
+    $background: 'laboratory.png'
     $map: @Map
 
     run: ->
