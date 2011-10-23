@@ -7,25 +7,37 @@
 
   <style type="text/css">
     body {
-      margin-top: 1.0em;
+      margin-top: 0;
       font-family: Helvetica, Arial, sans-serif;
     }
     #container {
       margin: 0 auto;
-      width: 850px;
+      width: 1100px;
+      height: 800px;
+      background: url(images/xxx.png) center top no-repeat;
+      text-align: center;
     }
     #game {
+      margin-top: 169px;
+      margin-left: 29px;
       width: 830px;
       height: 450px;
+      border: none;
     }
   </style>
+
+  <script type="text/javascript">
+    window.addEventListener('keydown', function (e) {
+      if (e.keyCode === 38 || e.keyCode === 40) {
+        e.preventDefault();
+      }
+    });
+  </script>
 </head>
 
 <body>
 
   <div id="container">
-
-    <h1>awesome</h1>
 
     <iframe id="game" src="build/frame.html"></iframe>
 

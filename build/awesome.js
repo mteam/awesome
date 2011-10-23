@@ -502,7 +502,10 @@
           case 40:
             this.crouch();
         }
-        return this.pressed[e.keyCode] = true;
+        this.pressed[e.keyCode] = true;
+      }
+      if (e.keyCode === 38 || e.keyCode === 40) {
+        e.preventDefault();
       }
     };
     _Class.prototype.keyUp = function(e) {
